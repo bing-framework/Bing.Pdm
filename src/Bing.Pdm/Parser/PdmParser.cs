@@ -69,7 +69,7 @@ namespace Bing.Pdm.Parser
         private List<PdmPhysicalDiagram> PhysicalDiagramParser(XmlNode node)
         {
             var list = new List<PdmPhysicalDiagram>();
-            foreach (XmlNode physicalDiagramNode in node.SelectNodes("c:PhysicalDiagrams/o:PhysicalDiagram", _xmlNsManager))
+            foreach (XmlNode physicalDiagramNode in node.SelectNodes("//c:PhysicalDiagrams/o:PhysicalDiagram", _xmlNsManager))
             {
                 var physicalDiagram = new PdmPhysicalDiagram();
                 physicalDiagram.Id = physicalDiagramNode?.GetAttribute("Id");
