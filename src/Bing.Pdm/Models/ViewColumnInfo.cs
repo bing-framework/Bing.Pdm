@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Bing.Pdm.Models
 {
     /// <summary>
-    /// 关键字
+    /// 视图列信息
     /// </summary>
-    public class PdmKey
+    public class ViewColumnInfo
     {
         /// <summary>
-        /// 所有者表信息
+        /// 视图列标识
         /// </summary>
-        private TableInfo _ownerTable = null;
-
-        /// <summary>
-        /// 关键字标识
-        /// </summary>
-        public string KeyId { get; set; }
+        public string ViewColumnId { get; set; }
 
         /// <summary>
         /// 对象标识
@@ -24,12 +18,12 @@ namespace Bing.Pdm.Models
         public string ObjectId { get; set; }
 
         /// <summary>
-        /// Key名
+        /// 列名
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Key代码。对应数据库中的Key
+        /// 列代码 => 表字段名
         /// </summary>
         public string Code { get; set; }
 
@@ -54,34 +48,37 @@ namespace Bing.Pdm.Models
         public string Modifier { get; set; }
 
         /// <summary>
-        /// Key涉及的列
+        /// 注释
         /// </summary>
-        public IList<ColumnInfo> Columns { get; private set; }
+        public string Comment { get; set; }
 
         /// <summary>
-        /// Key设计的列代码。根据此可访问到列信息对应列的ColumnId
+        /// 描述
         /// </summary>
-        public List<string> ColumnObjCodes { get; private set; }
+        public string Description { get; set; }
 
         /// <summary>
-        /// 初始化一个<see cref="PdmKey"/>类型的实例
+        /// 数据类型
         /// </summary>
-        /// <param name="table">所有者表信息</param>
-        public PdmKey(TableInfo table)
+        public string DataType { get; set; }
+
+        /// <summary>
+        /// 数据长度
+        /// </summary>
+        public string Length { get; set; }
+
+        /// <summary>
+        /// 所有者视图信息
+        /// </summary>
+        public ViewInfo OwnerViewInfo { get; private set; }
+
+        /// <summary>
+        /// 初始化一个<see cref="ViewColumnInfo"/>类型的实例
+        /// </summary>
+        /// <param name="view">所有者视图信息</param>
+        public ViewColumnInfo(ViewInfo view)
         {
-            _ownerTable = table;
-            ColumnObjCodes = new List<string>();
-        }
-
-        /// <summary>
-        /// 添加关联列
-        /// </summary>
-        /// <param name="column">列信息</param>
-        public void AddColumn(ColumnInfo column)
-        {
-            if (Columns == null)
-                Columns = new List<ColumnInfo>();
-            Columns.Add(column);
+            OwnerViewInfo = view;
         }
     }
 }

@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bing.Pdm.Models
 {
     /// <summary>
-    /// 关键字
+    /// 表信息
     /// </summary>
-    public class PdmKey
+    public class TableInfo
     {
         /// <summary>
-        /// 所有者表信息
+        /// 表标识
         /// </summary>
-        private TableInfo _ownerTable = null;
-
-        /// <summary>
-        /// 关键字标识
-        /// </summary>
-        public string KeyId { get; set; }
+        public string TableId { get; set; }
 
         /// <summary>
         /// 对象标识
@@ -24,12 +20,12 @@ namespace Bing.Pdm.Models
         public string ObjectId { get; set; }
 
         /// <summary>
-        /// Key名
+        /// 表名
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Key代码。对应数据库中的Key
+        /// 表代码。对应数据库表名
         /// </summary>
         public string Code { get; set; }
 
@@ -54,27 +50,51 @@ namespace Bing.Pdm.Models
         public string Modifier { get; set; }
 
         /// <summary>
-        /// Key涉及的列
+        /// 注释
+        /// </summary>
+        public string Comment { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// 表列集合
         /// </summary>
         public IList<ColumnInfo> Columns { get; private set; }
 
         /// <summary>
-        /// Key设计的列代码。根据此可访问到列信息对应列的ColumnId
+        /// 表Key集合
         /// </summary>
-        public List<string> ColumnObjCodes { get; private set; }
+        public IList<PdmKey> Keys { get; private set; }
 
         /// <summary>
-        /// 初始化一个<see cref="PdmKey"/>类型的实例
+        /// 主键Key代码.=>KeyId
         /// </summary>
-        /// <param name="table">所有者表信息</param>
-        public PdmKey(TableInfo table)
+        public string PrimaryKeyRefCode { get; set; }
+
+        /// <summary>
+        /// 主关键字
+        /// </summary>
+        public PdmKey PrimaryKey => Keys.FirstOrDefault(key => key.KeyId == PrimaryKeyRefCode);
+
+        /// <summary>
+        /// 物理选项
+        /// </summary>
+        public string PhysicalOptions { get; set; }
+
+        /// <summary>
+        /// 初始化一个<see cref="TableInfo"/>类型的实例
+        /// </summary>
+        public TableInfo()
         {
-            _ownerTable = table;
-            ColumnObjCodes = new List<string>();
+            Keys = new List<PdmKey>();
+            Columns = new List<ColumnInfo>();
         }
 
         /// <summary>
-        /// 添加关联列
+        /// 添加列
         /// </summary>
         /// <param name="column">列信息</param>
         public void AddColumn(ColumnInfo column)
@@ -82,6 +102,17 @@ namespace Bing.Pdm.Models
             if (Columns == null)
                 Columns = new List<ColumnInfo>();
             Columns.Add(column);
+        }
+
+        /// <summary>
+        /// 添加Key
+        /// </summary>
+        /// <param name="key">Key</param>
+        public void AddKey(PdmKey key)
+        {
+            if (Keys == null)
+                Keys = new List<PdmKey>();
+            Keys.Add(key);
         }
     }
 }

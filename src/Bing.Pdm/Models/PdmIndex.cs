@@ -22,9 +22,9 @@ namespace Bing.Pdm.Models
         /// </summary>
         public string Code { get; set; }
 
-        /// <summary>
-        /// PDM 列结构列表
-        /// </summary>
-        public List<PdmColumn> Columns { get; set; } = new List<PdmColumn>();
+        ///// <summary>
+        ///// PDM 列结构列表
+        ///// </summary>
+        //public List<PdmColumn> Columns { get; set; } = new List<PdmColumn>();
     }
 }

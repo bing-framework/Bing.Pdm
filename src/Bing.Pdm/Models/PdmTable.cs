@@ -29,10 +29,10 @@ namespace Bing.Pdm.Models
         /// </summary>
         public string Comment { get; set; }
 
-        /// <summary>
-        /// PDM 列结构列表
-        /// </summary>
-        public List<PdmColumn> Columns { get; set; } = new List<PdmColumn>();
+        ///// <summary>
+        ///// PDM 列结构列表
+        ///// </summary>
+        //public List<PdmColumn> Columns { get; set; } = new List<PdmColumn>();
 
         /// <summary>
         /// PDM 约束键列表
@@ -54,39 +54,39 @@ namespace Bing.Pdm.Models
         /// </summary>
         public PdmUser User { get; set; }
 
-        /// <summary>
-        /// 添加列
-        /// </summary>
-        /// <param name="column">列</param>
-        public void AddColumn(PdmColumn column)
-        {
-            column.Table = this;
-            Columns.Add(column);
-        }
+        ///// <summary>
+        ///// 添加列
+        ///// </summary>
+        ///// <param name="column">列</param>
+        //public void AddColumn(PdmColumn column)
+        //{
+        //    column.Table = this;
+        //    Columns.Add(column);
+        //}
 
-        /// <summary>
-        /// 查找列
-        /// </summary>
-        /// <param name="id">列ID</param>
-        public PdmColumn FindColumn(string id)
-        {
-            var result = Columns.FirstOrDefault(x => x.Id == id);
-            if (result == null)
-                throw new ArgumentException($"Id编号{id}，列没有找到");
-            return result;
-        }
+        ///// <summary>
+        ///// 查找列
+        ///// </summary>
+        ///// <param name="id">列ID</param>
+        //public PdmColumn FindColumn(string id)
+        //{
+        //    var result = Columns.FirstOrDefault(x => x.Id == id);
+        //    if (result == null)
+        //        throw new ArgumentException($"Id编号{id}，列没有找到");
+        //    return result;
+        //}
 
-        /// <summary>
-        /// 查找约束键
-        /// </summary>
-        /// <param name="id">约束ID</param>
-        public PdmKey FindKey(string id)
-        {
-            var result = Keys.FirstOrDefault(x => x.Id == id);
-            if (result == null)
-                throw new ArgumentException($"Id编号{id}，约束没有找到");
-            return result;
-        }
+        ///// <summary>
+        ///// 查找约束键
+        ///// </summary>
+        ///// <param name="id">约束ID</param>
+        //public PdmKey FindKey(string id)
+        //{
+        //    var result = Keys.FirstOrDefault(x => x.Id == id);
+        //    if (result == null)
+        //        throw new ArgumentException($"Id编号{id}，约束没有找到");
+        //    return result;
+        //}
 
         /// <summary>
         /// 输出字符串
