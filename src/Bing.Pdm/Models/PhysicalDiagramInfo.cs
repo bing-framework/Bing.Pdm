@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bing.Pdm.Models
+﻿namespace Bing.Pdm.Models
 {
     /// <summary>
     /// 物理图信息
@@ -23,8 +21,18 @@ namespace Bing.Pdm.Models
         public string PagerSize { get; set; }
 
         /// <summary>
-        /// 页面编剧
+        /// 页面边距
         /// </summary>
         public string PageMargins { get; set; }
+
+        /// <summary>
+        /// 页面方向
+        /// </summary>
+        public int PageOrientation { get; set; }
+
+        /// <summary>
+        /// 纸张类源
+        /// </summary>
+        public int PaperSource { get; set; }
     }
 }

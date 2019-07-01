@@ -90,5 +90,15 @@
         public const string OUser = "o:User";
 
         public const string AStereotype = "a:Stereotype";
+
+        public const string OModel = "o:Model";
+
+        public const string CChildren = "c:Children";
+
+        public const string AAuthor = "a:Author";
+
+        public const string AVersion = "a:Version";
+
+        public const string CPackages = "c:Packages";
     }
 }

@@ -18,6 +18,11 @@ namespace Bing.Pdm.Reader
             xmlnsManager.AddNamespace("o", Const.O);
 
             var pdmInfo = new PdmInfo();
+            var pdmNode = xmlDoc.SelectSingleNode($"//{Const.CChildren}/{Const.OModel}", xmlnsManager);
+            if (pdmNode != null)
+            {
+                pdmInfo = GetPdm(pdmNode);
+            }
 
             // 读取所有架构节点
             var schemaList = xmlDoc.SelectNodes($"//{Const.CUsers}", xmlnsManager);
@@ -47,7 +52,6 @@ namespace Bing.Pdm.Reader
                         }
                     }
                 }
-
             }
 
             // 读取所有视图节点
@@ -65,6 +69,39 @@ namespace Bing.Pdm.Reader
 
             return pdmInfo;
         }
+
+        #region GetPdm(获取Pdm信息)
+
+        /// <summary>
+        /// 获取Pdm信息
+        /// </summary>
+        /// <param name="node">节点</param>
+        private PdmInfo GetPdm(XmlNode node)
+        {
+            var pdm = new PdmInfo();
+            var xe = (XmlElement)node;
+            pdm.PdmId = xe.GetAttribute(Const.Id);
+            foreach (XmlNode property in xe.ChildNodes)
+            {
+                CommonInfoHandle(property, pdm);
+                switch (property.Name)
+                {
+                    case Const.AAuthor:
+                        pdm.Author = property.InnerText;
+                        break;
+                    case Const.AVersion:
+                        pdm.Version = property.InnerText;
+                        break;
+                    case Const.CPackages:
+                        InitPackages(property,pdm);
+                        break;
+                }
+            }
+
+            return pdm;
+        }
+
+        #endregion
 
         #region GetSchema(获取架构信息)
 
@@ -92,7 +129,6 @@ namespace Bing.Pdm.Reader
         }
 
         #endregion
-
 
         #region GetTable(获取表信息)
 
@@ -206,6 +242,42 @@ namespace Bing.Pdm.Reader
                 }
             }
             return view;
+        }
+
+        #endregion
+
+        #region InitPackages(初始化包信息)
+
+        /// <summary>
+        /// 初始化包信息
+        /// </summary>
+        /// <param name="packages">包节点集合</param>
+        /// <param name="pdm">PDM信息</param>
+        private void InitPackages(XmlNode packages, PdmInfo pdm)
+        {
+            foreach (XmlNode package in packages)
+                pdm.Packages.Add(GetPackage(package));
+        }
+
+        #endregion
+
+        #region GetPackage(获取包信息)
+
+        /// <summary>
+        /// 获取包信息
+        /// </summary>
+        /// <param name="node">节点</param>
+        private PackageInfo GetPackage(XmlNode node)
+        {
+            var package = new PackageInfo();
+            var xe = (XmlElement)node;
+            package.PackageId = xe.GetAttribute(Const.Id);
+            foreach (XmlNode property in xe.ChildNodes)
+            {
+                CommonInfoHandle(property, package);
+            }
+
+            return package;
         }
 
         #endregion
