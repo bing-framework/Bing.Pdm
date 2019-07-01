@@ -6,41 +6,93 @@ namespace Bing.Pdm.Reader
 {
     public class PdmReader : IPdmReader
     {
-        public void ReadFromFile(string pdmFile)
+        public PdmInfo ReadFromFile(string pdmFile)
         {
             // 加载文件
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(pdmFile);
             // 必须增加xml命名空间管理，否则读取会报错。
             var xmlnsManager = new XmlNamespaceManager(xmlDoc.NameTable);
-            xmlnsManager.AddNamespace("a", "attribute");
-            xmlnsManager.AddNamespace("c", "collection");
-            xmlnsManager.AddNamespace("o", "object");
+            xmlnsManager.AddNamespace("a", Const.A);
+            xmlnsManager.AddNamespace("c", Const.C);
+            xmlnsManager.AddNamespace("o", Const.O);
 
-            // 读取所有表节点
-            var tableList = xmlDoc.SelectNodes("//c:Tables", xmlnsManager);
-            foreach (XmlNode tables in tableList)
+            var pdmInfo = new PdmInfo();
+
+            // 读取所有架构节点
+            var schemaList = xmlDoc.SelectNodes($"//{Const.CUsers}", xmlnsManager);
+            if (schemaList != null)
             {
-                foreach (XmlNode table in tables.ChildNodes)
+                foreach (XmlNode schemas in schemaList)
                 {
-                    // 排除快捷对象
-                    if (table.Name != "o:Shortcut")
+                    foreach (XmlNode schema in schemas.ChildNodes)
                     {
-                        // 加入表
+                        pdmInfo.Schemas.Add(GetSchema(schema));
                     }
                 }
             }
 
-            // 读取所有视图节点
-            var viewList = xmlDoc.SelectNodes("//c:Views", xmlnsManager);
-            foreach (XmlNode views in viewList)
+            // 读取所有表节点
+            var tableList = xmlDoc.SelectNodes($"//{Const.CTables}", xmlnsManager);
+            if (tableList != null)
             {
-                foreach (XmlNode view in views.ChildNodes)
+                foreach (XmlNode tables in tableList)
                 {
-                    // 加入视图
+                    foreach (XmlNode table in tables.ChildNodes)
+                    {
+                        // 排除快捷对象
+                        if (table.Name != "o:Shortcut")
+                        {
+                            pdmInfo.Tables.Add(GetTable(table));
+                        }
+                    }
+                }
+
+            }
+
+            // 读取所有视图节点
+            var viewList = xmlDoc.SelectNodes($"//{Const.CViews}", xmlnsManager);
+            if (viewList != null)
+            {
+                foreach (XmlNode views in viewList)
+                {
+                    foreach (XmlNode view in views.ChildNodes)
+                    {
+                        pdmInfo.Views.Add(GetView(view));
+                    }
                 }
             }
+
+            return pdmInfo;
         }
+
+        #region GetSchema(获取架构信息)
+
+        /// <summary>
+        /// 获取架构信息
+        /// </summary>
+        /// <param name="node">节点</param>
+        private SchemaInfo GetSchema(XmlNode node)
+        {
+            var schema = new SchemaInfo();
+            var xe = (XmlElement)node;
+            schema.SchemaId = xe.GetAttribute(Const.Id);
+            foreach (XmlNode property in xe.ChildNodes)
+            {
+                CommonInfoHandle(property, schema);
+                switch (property.Name)
+                {
+                    case Const.AStereotype:
+                        schema.StereoType = property.InnerText;
+                        break;
+                }
+            }
+
+            return schema;
+        }
+
+        #endregion
+
 
         #region GetTable(获取表信息)
 
@@ -52,55 +104,69 @@ namespace Bing.Pdm.Reader
         {
             var table = new TableInfo();
             var xe = (XmlElement)node;
-            table.TableId = xe.GetAttribute("Id");
+            table.TableId = xe.GetAttribute(Const.Id);
             var properties = xe.ChildNodes;
             foreach (XmlNode property in properties)
             {
+                CommonInfoHandle(property, table);
                 switch (property.Name)
                 {
-                    case "a:ObjectID":
-                        table.ObjectId = property.InnerText;
-                        break;
-                    case "a:Name":
-                        table.Name = property.InnerText;
-                        break;
-                    case "a:Code":
-                        table.Code = property.InnerText;
-                        break;
-                    case "a:CreationDate":
-                        table.CreationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Creator":
-                        table.Creator = property.InnerText;
-                        break;
-                    case "a:ModificationDate":
-                        table.ModificationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Modifier":
-                        table.Modifier = property.InnerText;
-                        break;
-                    case "a:Comment":
+                    case Const.AComment:
                         table.Comment = property.InnerText;
                         break;
-                    case "a:PhysicalOptions":
+                    case Const.APhysicalOptions:
                         table.PhysicalOptions = property.InnerText;
                         break;
-                    case "a:Description":
+                    case Const.ADescription:
                         table.Description = property.InnerText;
                         break;
-                    case "c:Columns":
+                    case Const.CColumns:
                         InitColumns(property,table);
                         break;
-                    case "c:Keys":
+                    case Const.CKeys:
                         InitKeys(property,table);
                         break;
-                    case "c:PrimaryKey":
+                    case Const.CPrimaryKey:
                         InitPrimaryKey(property, table);
                         break;
                 }
             }
 
             return table;
+        }
+
+        /// <summary>
+        /// 通用信息处理
+        /// </summary>
+        /// <typeparam name="T">PDM对象</typeparam>
+        /// <param name="node">节点</param>
+        /// <param name="entity">PDM实体</param>
+        private void CommonInfoHandle<T>(XmlNode node, T entity) where T : PdmCommonInfo
+        {
+            switch (node.Name)
+            {
+                case Const.AObjectId:
+                    entity.ObjectId = node.InnerText;
+                    break;
+                case Const.AName:
+                    entity.Name = node.InnerText;
+                    break;
+                case Const.ACode:
+                    entity.Code = node.InnerText;
+                    break;
+                case Const.ACreationDate:
+                    entity.CreationDate = String2DateTime(node.InnerText);
+                    break;
+                case Const.ACreator:
+                    entity.Creator = node.InnerText;
+                    break;
+                case Const.AModificationDate:
+                    entity.ModificationDate = String2DateTime(node.InnerText);
+                    break;
+                case Const.AModifier:
+                    entity.Modifier = node.InnerText;
+                    break;
+            }
         }
 
         #endregion
@@ -115,46 +181,26 @@ namespace Bing.Pdm.Reader
         {
             var view = new ViewInfo();
             var xe = (XmlElement)node;
-            view.ViewId = xe.GetAttribute("Id");
+            view.ViewId = xe.GetAttribute(Const.Id);
             var properties = xe.ChildNodes;
             foreach (XmlNode property in properties)
             {
+                CommonInfoHandle(property, view);
                 switch (property.Name)
                 {
-                    case "a:ObjectID":
-                        view.ObjectId = property.InnerText;
-                        break;
-                    case "a:Name":
-                        view.Name = property.InnerText;
-                        break;
-                    case "a:Code":
-                        view.Code = property.InnerText;
-                        break;
-                    case "a:CreationDate":
-                        view.CreationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Creator":
-                        view.Creator = property.InnerText;
-                        break;
-                    case "a:ModificationDate":
-                        view.ModificationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Modifier":
-                        view.Modifier = property.InnerText;
-                        break;
-                    case "a:Comment":
+                    case Const.AComment:
                         view.Comment = property.InnerText;
                         break;
-                    case "a:Description":
+                    case Const.ADescription:
                         view.Description = property.InnerText;
                         break;
-                    case "a:View.SQLQuery":
+                    case Const.AViewSQLQuery:
                         view.ViewSQLQuery = property.InnerText;
                         break;
-                    case "a:TaggedSQLQuery":
+                    case Const.ATaggedSQLQuery:
                         view.TaggedSQLQuery = property.InnerText;
                         break;
-                    case "c:Columns":
+                    case Const.CColumns:
                         InitColumns(property, view);
                         break;
                 }
@@ -212,38 +258,18 @@ namespace Bing.Pdm.Reader
         /// </summary>
         /// <param name="node">节点</param>
         /// <param name="ownerTable">所有者表信息</param>
-        private PdmKey GetKey(XmlNode node, TableInfo ownerTable)
+        private KeyInfo GetKey(XmlNode node, TableInfo ownerTable)
         {
-            var key = new PdmKey(ownerTable);
+            var key = new KeyInfo(ownerTable);
             var xe = (XmlElement)node;
-            key.KeyId = xe.GetAttribute("Id");
+            key.KeyId = xe.GetAttribute(Const.Id);
             var properties = xe.ChildNodes;
             foreach (XmlNode property in properties)
             {
+                CommonInfoHandle(property, key);
                 switch (property.Name)
-                {
-                    case "a:ObjectID":
-                        key.ObjectId = property.InnerText;
-                        break;
-                    case "a:Name":
-                        key.Name = property.InnerText;
-                        break;
-                    case "a:Code":
-                        key.Code = property.InnerText;
-                        break;
-                    case "a:CreationDate":
-                        key.CreationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Creator":
-                        key.Creator = property.InnerText;
-                        break;
-                    case "a:ModificationDate":
-                        key.ModificationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Modifier":
-                        key.Modifier = property.InnerText;
-                        break;
-                    case "c:Key.Columns":
+                {                    
+                    case Const.CKeyColumns:
                         InitKeyColumns(property,key);
                         break;
                 }
@@ -261,12 +287,12 @@ namespace Bing.Pdm.Reader
         /// </summary>
         /// <param name="node">节点</param>
         /// <param name="key">键</param>
-        private void InitKeyColumns(XmlNode node, PdmKey key)
+        private void InitKeyColumns(XmlNode node, KeyInfo key)
         {
             var xe = (XmlElement)node;
             foreach (XmlNode property in xe.ChildNodes)
             {
-                key.ColumnObjCodes.Add(((XmlElement) property).GetAttribute("Ref"));
+                key.ColumnRefIds.Add(((XmlElement) property).GetAttribute(Const.Ref));
             }
         }
 
@@ -298,7 +324,7 @@ namespace Bing.Pdm.Reader
             if (xe.ChildNodes.Count > 0)
             {
                 var pk = (XmlElement)xe.ChildNodes[0];
-                return pk.GetAttribute("Ref");
+                return pk.GetAttribute(Const.Ref);
             }
 
             return string.Empty;
@@ -317,58 +343,38 @@ namespace Bing.Pdm.Reader
         {
             var column = new ColumnInfo(ownerTable);
             var xe = (XmlElement)node;
-            column.ColumnId = xe.GetAttribute("Id");
+            column.ColumnId = xe.GetAttribute(Const.Id);
             var properties = xe.ChildNodes;
             foreach (XmlNode property in properties)
             {
+                CommonInfoHandle(property, column);
                 switch (property.Name)
                 {
-                    case "a:ObjectID":
-                        column.ObjectId = property.InnerText;
-                        break;
-                    case "a:Name":
-                        column.Name = property.InnerText;
-                        break;
-                    case "a:Code":
-                        column.Code = property.InnerText;
-                        break;
-                    case "a:CreationDate":
-                        column.CreationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Creator":
-                        column.Creator = property.InnerText;
-                        break;
-                    case "a:ModificationDate":
-                        column.ModificationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Modifier":
-                        column.Modifier = property.InnerText;
-                        break;
-                    case "a:Comment":
+                    case Const.AComment:
                         column.Comment = property.InnerText;
                         break;
-                    case "a:DataType":
+                    case Const.ADataType:
                         column.DataType = property.InnerText;
                         break;
-                    case "a:Length":
+                    case Const.ALength:
                         column.Length = property.InnerText;
                         break;
-                    case "a.Identity":
+                    case Const.AIdentity:
                         column.Identity = ConvertToBoolean(property.InnerText);
                         break;
-                    case "a:Column.Mandatory":
+                    case Const.AColumnMandatory:
                         column.Mandatory = ConvertToBoolean(property.InnerText);
                         break;
-                    case "a:PhysicalOptions":
+                    case Const.APhysicalOptions:
                         column.PhysicalOptions = property.InnerText;
                         break;
-                    case "a:ExtendedAttributesText":
+                    case Const.AExtendedAttributesText:
                         column.ExtendedAttributesText = property.InnerText;
                         break;
-                    case "a:Precision":
+                    case Const.APrecision:
                         column.Precision = property.InnerText;
                         break;
-                    case "a:Description":
+                    case Const.ADescription:
                         column.Description = property.InnerText;
                         break;
                 }
@@ -386,43 +392,23 @@ namespace Bing.Pdm.Reader
         {
             var column = new ViewColumnInfo(ownerView);
             var xe = (XmlElement)node;
-            column.ViewColumnId = xe.GetAttribute("Id");
+            column.ViewColumnId = xe.GetAttribute(Const.Id);
             var properties = xe.ChildNodes;
             foreach (XmlNode property in properties)
             {
+                CommonInfoHandle(property, column);
                 switch (property.Name)
                 {
-                    case "a:ObjectID":
-                        column.ObjectId = property.InnerText;
-                        break;
-                    case "a:Name":
-                        column.Name = property.InnerText;
-                        break;
-                    case "a:Code":
-                        column.Code = property.InnerText;
-                        break;
-                    case "a:CreationDate":
-                        column.CreationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Creator":
-                        column.Creator = property.InnerText;
-                        break;
-                    case "a:ModificationDate":
-                        column.ModificationDate = String2DateTime(property.InnerText);
-                        break;
-                    case "a:Modifier":
-                        column.Modifier = property.InnerText;
-                        break;
-                    case "a:Comment":
+                    case Const.AComment:
                         column.Comment = property.InnerText;
                         break;
-                    case "a:DataType":
+                    case Const.ADataType:
                         column.DataType = property.InnerText;
                         break;
-                    case "a:Length":
+                    case Const.ALength:
                         column.Length = property.InnerText;
                         break;
-                    case "a:Description":
+                    case Const.ADescription:
                         column.Description = property.InnerText;
                         break;
                 }

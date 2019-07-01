@@ -1,4 +1,6 @@
-﻿namespace Bing.Pdm
+﻿using Bing.Pdm.Models;
+
+namespace Bing.Pdm
 {
     /// <summary>
     /// PDM 读取器
@@ -9,6 +11,6 @@
         /// 读取指定PDM文件
         /// </summary>
         /// <param name="pdmFile">PDM文件名</param>
-        void ReadFromFile(string pdmFile);
+        PdmInfo ReadFromFile(string pdmFile);
     }
 }

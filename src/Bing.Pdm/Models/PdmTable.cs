@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Bing.Pdm.Models
 {
@@ -37,12 +35,12 @@ namespace Bing.Pdm.Models
         /// <summary>
         /// PDM 约束键列表
         /// </summary>
-        public List<PdmKey> Keys { get; set; } = new List<PdmKey>();
+        public List<KeyInfo> Keys { get; set; } = new List<KeyInfo>();
 
         /// <summary>
         /// 主键
         /// </summary>
-        public PdmKey PrimaryKey { get; set; }
+        public KeyInfo PrimaryKey { get; set; }
 
         /// <summary>
         /// PDM 索引列表

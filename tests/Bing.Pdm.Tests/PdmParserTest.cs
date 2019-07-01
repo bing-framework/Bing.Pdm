@@ -1,4 +1,5 @@
 ﻿using Bing.Pdm.Parser;
+using Bing.Pdm.Reader;
 using Bing.Utils.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -13,13 +14,19 @@ namespace Bing.Pdm.Tests
         private IPdmParser _parser;
 
         /// <summary>
+        /// 读取器
+        /// </summary>
+        private IPdmReader _reader;
+
+        /// <summary>
         /// 文件路径
         /// </summary>
-        private string _filePath = "D:\\物流平台.pdm";
+        private string _filePath = "D:\\test\\物流平台.pdm";
 
         public PdmParserTest(ITestOutputHelper output) : base(output)
         {
             _parser = new PdmParser();
+            _reader = new PdmReader();
         }
 
         /// <summary>
@@ -30,6 +37,36 @@ namespace Bing.Pdm.Tests
         {
             var result = _parser.Parser(_filePath);
             Output.WriteLine(result.ToJson());
+        }
+
+        /// <summary>
+        /// 测试 架构集合
+        /// </summary>
+        [Fact]
+        public void Test_Reader_Schema()
+        {
+            var result = _reader.ReadFromFile(_filePath);
+            Output.WriteLine(result.Schemas.ToJson());
+        }
+
+        /// <summary>
+        /// 测试 视图集合
+        /// </summary>
+        [Fact]
+        public void Test_Reader_View()
+        {
+            var result = _reader.ReadFromFile(_filePath);
+            Output.WriteLine(result.Views.ToJson());
+        }
+
+        /// <summary>
+        /// 测试 表集合
+        /// </summary>
+        [Fact]
+        public void Test_Reader_Table()
+        {
+            var result = _reader.ReadFromFile(_filePath);
+            Output.WriteLine(result.Tables.ToJson());
         }
     }
 }

@@ -1,51 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 
 namespace Bing.Pdm.Models
 {
     /// <summary>
     /// 表列信息
     /// </summary>
-    public class ColumnInfo
+    public class ColumnInfo : PdmCommonInfo
     {
         /// <summary>
         /// 列标识
         /// </summary>
         public string ColumnId { get; set; }
-
-        /// <summary>
-        /// 对象标识
-        /// </summary>
-        public string ObjectId { get; set; }
-
-        /// <summary>
-        /// 列名
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 列代码。对应数据库表字段名
-        /// </summary>
-        public string Code { get; set; }
-
-        /// <summary>
-        /// 创建日期
-        /// </summary>
-        public DateTime CreationDate { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string Creator { get; set; }
-
-        /// <summary>
-        /// 修改日期
-        /// </summary>
-        public DateTime ModificationDate { get; set; }
-
-        /// <summary>
-        /// 修改人
-        /// </summary>
-        public string Modifier { get; set; }
 
         /// <summary>
         /// 注释
@@ -73,7 +38,7 @@ namespace Bing.Pdm.Models
         public bool Identity { get; set; }
 
         /// <summary>
-        /// 是否可空
+        /// 是否禁止为空
         /// </summary>
         public bool Mandatory { get; set; }
 
@@ -95,6 +60,7 @@ namespace Bing.Pdm.Models
         /// <summary>
         /// 所有者表信息
         /// </summary>
+        [JsonIgnore]
         public TableInfo OwnerTable { get; private set; }
 
         /// <summary>
@@ -105,7 +71,7 @@ namespace Bing.Pdm.Models
             get
             {
                 var key = OwnerTable.PrimaryKey;
-                return key != null && key.ColumnObjCodes.Contains(ColumnId);
+                return key != null && key.ColumnRefIds.Contains(ColumnId);
             }
         }
 
