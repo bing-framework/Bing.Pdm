@@ -1,0 +1,273 @@
+<Model xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
+    <o:RootObject Id="o1">
+        <a:SessionID>00000000-0000-0000-0000-000000000000</a:SessionID>
+        <c:Children>
+            <o:Model Id="o2">
+                <a:ObjectID>7F20137C-7382-4790-B9CE-833A8EC88310</a:ObjectID>
+                <a:Name>物流平台</a:Name>
+                <a:Code>物流平台</a:Code>
+                <a:CreationDate>1554709407</a:CreationDate>
+                <a:Creator>jianx</a:Creator>
+                <a:ModificationDate>1555673127</a:ModificationDate>
+                <a:Modifier>jianx</a:Modifier>
+                <a:PackageOptionsText></a:PackageOptionsText>
+                <a:ModelOptionsText></a:ModelOptionsText>
+                <a:Author>简玄冰</a:Author>
+                <a:Version>0.0.1</a:Version>
+                <a:RepositoryFilename>G:\YTB\Git\Utopa.Tms\documents\数据建模\物流平台.pdm</a:RepositoryFilename>
+                <c:DBMS>
+                    <o:Shortcut Id="o3">
+                        <a:ObjectID>D6351B09-1DAE-4BDC-913B-17700A083B17</a:ObjectID>
+                        <a:Name>Microsoft SQL Server 2012</a:Name>
+                        <a:Code>MSSQLSRV2012</a:Code>
+                        <a:CreationDate>1554709406</a:CreationDate>
+                        <a:Creator>jianx</a:Creator>
+                        <a:ModificationDate>1554709406</a:ModificationDate>
+                        <a:Modifier>jianx</a:Modifier>
+                        <a:TargetStereotype/>
+                        <a:TargetID>11D14009-FEF7-43A3-BC76-BE5B34F11D08</a:TargetID>
+                        <a:TargetClassID>4BA9F647-DAB1-11D1-9944-006097355D9B</a:TargetClassID>
+                    </o:Shortcut>
+                </c:DBMS>
+                <c:PhysicalDiagrams>
+                    <o:PhysicalDiagram Id="o4">
+                        <a:ObjectID>178772B9-DA9B-4BDC-804C-F16A75D8D190</a:ObjectID>
+                        <a:Name>物流平台</a:Name>
+                        <a:Code>物流平台</a:Code>
+                        <a:CreationDate>1554709407</a:CreationDate>
+                        <a:Creator>jianx</a:Creator>
+                        <a:ModificationDate>1554794979</a:ModificationDate>
+                        <a:Modifier>jianx</a:Modifier>
+                        <a:DisplayPreferences></a:DisplayPreferences>
+                        <a:PaperSize>(8268, 11693)</a:PaperSize>
+                        <a:PageMargins>((315,354), (433,354))</a:PageMargins>
+                        <a:PageOrientation>1</a:PageOrientation>
+                        <a:PaperSource>15</a:PaperSource>
+                        <c:Symbols>
+                            <o:PackageSymbol Id="o5">
+                                <a:CreationDate>1554709526</a:CreationDate>
+                                <a:ModificationDate>1556440518</a:ModificationDate>
+                                <a:IconMode>-1</a:IconMode>
+                                <a:Rect>((2499,-1998), (7298,2001))</a:Rect>
+                                <a:LineColor>11711154</a:LineColor>
+                                <a:FillColor>12648447</a:FillColor>
+                                <a:ShadowColor>12632256</a:ShadowColor>
+                                <a:FontList>STRN 0 新宋体,8,N DISPNAME 0 新宋体,8,N LABL 0 新宋体,8,N</a:FontList>
+                                <a:BrushStyle>6</a:BrushStyle>
+                                <a:GradientFillMode>65</a:GradientFillMode>
+                                <a:GradientEndColor>16777215</a:GradientEndColor>
+                                <c:Object>
+                                    <o:Package Ref="o6"/>
+                                </c:Object>
+                            </o:PackageSymbol>
+                        </c:Symbols>
+                    </o:PhysicalDiagram>
+                </c:PhysicalDiagrams>
+                <c:Packages>
+                    <o:Package Id="o6">
+                        <a:ObjectID>1C14E47A-F3DE-43B8-A4D7-1CF5283FD74E</a:ObjectID>
+                        <a:Name>00 - 片段</a:Name>
+                        <a:Code>00 - 片段</a:Code>
+                        <a:CreationDate>1554709526</a:CreationDate>
+                        <a:Creator>jianx</a:Creator>
+                        <a:ModificationDate>1554728354</a:ModificationDate>
+                        <a:Modifier>jianx</a:Modifier>
+                        <a:PackageOptionsText></a:PackageOptionsText>
+                        <c:PhysicalDiagrams>
+                            <o:PhysicalDiagram Id="o7">
+                                <a:ObjectID>EB526495-1DE2-4876-A964-579F4D20FC60</a:ObjectID>
+                                <a:Name>01 - 逻辑删除</a:Name>
+                                <a:Code>01 - 逻辑删除</a:Code>
+                                <a:CreationDate>1554709526</a:CreationDate>
+                                <a:Creator>jianx</a:Creator>
+                                <a:ModificationDate>1554794979</a:ModificationDate>
+                                <a:Modifier>jianx</a:Modifier>
+                                <a:DisplayPreferences></a:DisplayPreferences>
+                                <a:PaperSize>(8268, 11693)</a:PaperSize>
+                                <a:PageMargins>((315,354), (433,354))</a:PageMargins>
+                                <a:PageOrientation>1</a:PageOrientation>
+                                <a:PaperSource>15</a:PaperSource>
+                                <c:Symbols>
+                                    <o:ReferenceSymbol Id="o71">
+                                        <a:CreationDate>1554717500</a:CreationDate>
+                                        <a:ModificationDate>1554863652</a:ModificationDate>
+                                        <a:Rect>((-3757,-1221), (-2507,4524))</a:Rect>
+                                        <a:ListOfPoints>((-3132,-821),(-3132,4124))</a:ListOfPoints>
+                                        <a:CornerStyle>1</a:CornerStyle>
+                                        <a:ArrowStyle>1</a:ArrowStyle>
+                                        <a:LineColor>12615680</a:LineColor>
+                                        <a:ShadowColor>12632256</a:ShadowColor>
+                                        <a:FontList></a:FontList>
+                                        <c:SourceSymbol>
+                                            <o:TableSymbol Ref="o72"/>
+                                        </c:SourceSymbol>
+                                        <c:DestinationSymbol>
+                                            <o:TableSymbol Ref="o73"/>
+                                        </c:DestinationSymbol>
+                                        <c:Object>
+                                            <o:Reference Ref="o74"/>
+                                        </c:Object>
+                                    </o:ReferenceSymbol>
+                                    <o:TableSymbol Id="o8">
+                                        <a:CreationDate>1554709578</a:CreationDate>
+                                        <a:ModificationDate>1554794979</a:ModificationDate>
+                                        <a:IconMode>-1</a:IconMode>
+                                        <a:Rect>((-2487,5763), (7065,9762))</a:Rect>
+                                        <a:LineColor>12615680</a:LineColor>
+                                        <a:FillColor>16570034</a:FillColor>
+                                        <a:ShadowColor>12632256</a:ShadowColor>
+                                        <a:FontList></a:FontList>
+                                        <a:BrushStyle>6</a:BrushStyle>
+                                        <a:GradientFillMode>65</a:GradientFillMode>
+                                        <a:GradientEndColor>16777215</a:GradientEndColor>
+                                        <c:Object>
+                                            <o:Table Ref="o9"/>
+                                        </c:Object>
+                                    </o:TableSymbol>
+                                </c:Symbols>
+                            </o:PhysicalDiagram>
+                        </c:PhysicalDiagrams>
+                        <c:DefaultDiagram>
+                            <o:PhysicalDiagram Ref="o7"/>
+                        </c:DefaultDiagram>
+                        <c:Tables>
+                            <o:Table Id="o9">
+                                <a:ObjectID>5875A3E5-9A3C-4D03-84AE-D504773F760F</a:ObjectID>
+                                <a:Name>逻辑删除</a:Name>
+                                <a:Code>逻辑删除</a:Code>
+                                <a:CreationDate>1554709578</a:CreationDate>
+                                <a:Creator>jianx</a:Creator>
+                                <a:ModificationDate>1554792949</a:ModificationDate>
+                                <a:Modifier>jianx</a:Modifier>
+                                <a:TotalSavingCurrency/>
+                                <c:Columns>
+                                    <o:Column Id="o38">
+                                        <a:ObjectID>D09E0AC1-38D2-4081-85EC-159FD78D8A25</a:ObjectID>
+                                        <a:Name>是否删除#IsDeleted</a:Name>
+                                        <a:Code>IsDeleted</a:Code>
+                                        <a:CreationDate>1554709807</a:CreationDate>
+                                        <a:Creator>jianx</a:Creator>
+                                        <a:ModificationDate>1554792922</a:ModificationDate>
+                                        <a:Modifier>jianx</a:Modifier>
+                                        <a:Comment>是否删除</a:Comment>
+                                        <a:DataType>bit</a:DataType>
+                                        <a:Column.Mandatory>1</a:Column.Mandatory>
+                                    </o:Column>
+                                </c:Columns>
+                                <c:Keys>
+                                    <o:Key Id="o675">
+                                        <a:ObjectID>45F8B488-69C5-445C-B061-2296EAC83282</a:ObjectID>
+                                        <a:Name>Key_1</a:Name>
+                                        <a:Code>Key_1</a:Code>
+                                        <a:CreationDate>1555667480</a:CreationDate>
+                                        <a:Creator>jianx</a:Creator>
+                                        <a:ModificationDate>1555667480</a:ModificationDate>
+                                        <a:Modifier>jianx</a:Modifier>
+                                        <c:Key.Columns>
+                                        <o:Column Ref="o665"/>
+                                        </c:Key.Columns>
+                                    </o:Key>
+                                </c:Keys>
+                                <c:Owner>
+                                    <o:User Ref="o39"/>
+                                </c:Owner>
+                                <c:PrimaryKey>
+                                    <o:Key Ref="o675"/>
+                                </c:PrimaryKey>
+                                <c:ClusterObject>
+                                    <o:Key Ref="o675"/>
+                                </c:ClusterObject>
+                            </o:Table>
+                        </c:Tables>
+                        <c:References>
+                            <o:Reference Id="o74">
+                                <a:ObjectID>6ED2799E-14CA-44F5-9CCD-12151E66AE7B</a:ObjectID>
+                                <a:Name>Reference_ShippingPoint_ShippingCenter</a:Name>
+                                <a:Code>Reference_ShippingPoint_ShippingCenter</a:Code>
+                                <a:CreationDate>1554717500</a:CreationDate>
+                                <a:Creator>jianx</a:Creator>
+                                <a:ModificationDate>1554717524</a:ModificationDate>
+                                <a:Modifier>jianx</a:Modifier>
+                                <a:Cardinality>0..*</a:Cardinality>
+                                <c:ParentTable>
+                                    <o:Table Ref="o81"/>
+                                </c:ParentTable>
+                                <c:ChildTable>
+                                    <o:Table Ref="o82"/>
+                                </c:ChildTable>
+                                <c:ParentKey>
+                                    <o:Key Ref="o266"/>
+                                </c:ParentKey>
+                                <c:Joins>
+                                    <o:ReferenceJoin Id="o765">
+                                    <a:ObjectID>F7015FC7-BCF5-4DBC-BF22-DF50ABD4C16C</a:ObjectID>
+                                    <a:CreationDate>1554717500</a:CreationDate>
+                                    <a:Creator>jianx</a:Creator>
+                                    <a:ModificationDate>1554717500</a:ModificationDate>
+                                    <a:Modifier>jianx</a:Modifier>
+                                    <c:Object1>
+                                        <o:Column Ref="o239"/>
+                                    </c:Object1>
+                                    <c:Object2>
+                                        <o:Column Ref="o269"/>
+                                    </c:Object2>
+                                    </o:ReferenceJoin>
+                                </c:Joins>
+                            </o:Reference>
+                        </c:References>
+                    </o:Package>
+                </c:Packages>
+                <c:DefaultDiagram>
+                    <o:PhysicalDiagram Ref="o4"/>
+                </c:DefaultDiagram>
+                <c:Users>
+                    <o:User Id="o39">
+                        <a:ObjectID>C92A15DA-9AF9-49A6-9FF5-4C4D18A649E3</a:ObjectID>
+                        <a:Name>系统( Systems )</a:Name>
+                        <a:Code>Systems</a:Code>
+                        <a:CreationDate>1554709726</a:CreationDate>
+                        <a:Creator>jianx</a:Creator>
+                        <a:ModificationDate>1554717202</a:ModificationDate>
+                        <a:Modifier>jianx</a:Modifier>
+                        <a:Stereotype>Schema</a:Stereotype>
+                    </o:User>
+                </c:Users>
+                <c:DefaultGroups>
+                    <o:Group Id="o1169">
+                        <a:ObjectID>D8597A25-6D22-4C71-B267-6A6DF079C369</a:ObjectID>
+                        <a:Name>PUBLIC</a:Name>
+                        <a:Code>PUBLIC</a:Code>
+                        <a:CreationDate>1554709406</a:CreationDate>
+                        <a:Creator>jianx</a:Creator>
+                        <a:ModificationDate>1555673056</a:ModificationDate>
+                        <a:Modifier>jianx</a:Modifier>
+                        <c:Group.Users>
+                            <o:User Ref="o39"/>
+                            <o:User Ref="o267"/>
+                            <o:User Ref="o1018"/>
+                            <o:User Ref="o1134"/>
+                        </c:Group.Users>
+                    </o:Group>
+                </c:DefaultGroups>
+                <c:TargetModels>
+                    <o:TargetModel Id="o1170">
+                        <a:ObjectID>C1A0995E-1431-4D2C-9FD4-775149762407</a:ObjectID>
+                        <a:Name>Microsoft SQL Server 2012</a:Name>
+                        <a:Code>MSSQLSRV2012</a:Code>
+                        <a:CreationDate>1554709406</a:CreationDate>
+                        <a:Creator>jianx</a:Creator>
+                        <a:ModificationDate>1341932191</a:ModificationDate>
+                        <a:Modifier>jianx</a:Modifier>
+                        <a:TargetModelURL>file:///%[XDB]%/sqlsv2012.xdb</a:TargetModelURL>
+                        <a:TargetModelID>11D14009-FEF7-43A3-BC76-BE5B34F11D08</a:TargetModelID>
+                        <a:TargetModelClassID>4BA9F647-DAB1-11D1-9944-006097355D9B</a:TargetModelClassID>
+                        <a:TargetModelLastModificationDate>1341932191</a:TargetModelLastModificationDate>
+                        <c:SessionShortcuts>
+                            <o:Shortcut Ref="o3"/>
+                        </c:SessionShortcuts>
+                    </o:TargetModel>
+                </c:TargetModels>
+            </o:Model>
+        </c:Children>
+    </o:RootObject>
+</Model>

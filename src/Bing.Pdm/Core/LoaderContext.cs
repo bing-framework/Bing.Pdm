@@ -7,7 +7,7 @@ namespace Bing.Pdm.Core
     /// <summary>
     /// 加载器上下文
     /// </summary>
-    public class LoaderContext : ILoaderContext
+    internal class LoaderContext : ILoaderContext
     {
         /// <summary>
         /// Key加载器
