@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Bing.Pdm.Models.Tables;
 
-namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models.Keys
 {
     /// <summary>
     /// 键信息

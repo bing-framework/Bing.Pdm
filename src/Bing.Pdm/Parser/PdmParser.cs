@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Xml;
 using Bing.Pdm.Models;
-using Bing.Utils.Extensions;
-using Bing.Utils.Helpers;
 
 namespace Bing.Pdm.Parser
 {

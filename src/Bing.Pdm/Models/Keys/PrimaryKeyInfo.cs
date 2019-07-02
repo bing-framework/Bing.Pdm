@@ -1,4 +1,4 @@
-﻿namespace Bing.Pdm.Models
+﻿namespace Bing.Pdm.Models.Keys
 {
     /// <summary>
     /// 主键信息

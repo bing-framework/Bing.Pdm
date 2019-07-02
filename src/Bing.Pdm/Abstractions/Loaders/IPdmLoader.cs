@@ -1,16 +1,16 @@
 ﻿using Bing.Pdm.Models;
 
-namespace Bing.Pdm
+namespace Bing.Pdm.Abstractions.Loaders
 {
     /// <summary>
-    /// PDM 读取器
+    /// PDM加载器
     /// </summary>
-    public interface IPdmReader
+    public interface IPdmLoader
     {
         /// <summary>
-        /// 读取指定PDM文件
+        /// 获取PDM信息
         /// </summary>
         /// <param name="filePath">文件路径</param>
-        PdmInfo ReadFromFile(string filePath);
+        PdmInfo GetPdm(string filePath);
     }
 }

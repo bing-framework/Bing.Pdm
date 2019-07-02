@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Bing.Pdm.Models.Keys;
 
-namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models.Tables
 {
     /// <summary>
     /// 表信息
     /// </summary>
-    public class TableInfo : PdmCommonInfo
+    public class TableInfo : PdmCommonInfo, IComment, IDescription
     {
         /// <summary>
         /// 表标识

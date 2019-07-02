@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Bing.Pdm.Models.Tables;
+using Bing.Pdm.Models.Views;
 
 namespace Bing.Pdm.Models
 {

@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models.Tables
 {
     /// <summary>
     /// 表列信息
     /// </summary>
-    public class ColumnInfo : PdmCommonInfo
+    public class ColumnInfo : PdmCommonInfo, IComment, IDescription
     {
         /// <summary>
         /// 列标识

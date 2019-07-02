@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models.Views
 {
     /// <summary>
     /// 视图信息
