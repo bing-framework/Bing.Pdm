@@ -126,8 +126,20 @@ namespace Bing.Pdm.Core.Loaders
                     case Const.CDBMS:
                         InitDbms(property,pdm);
                         break;
+                    case Const.CPhysicalDiagrams:
+                        break;
                     case Const.CPackages:
                         InitPackages(property, pdm);
+                        break;
+                    case Const.CDefaultDiagarm:
+                        break;
+                    case Const.CUsers:
+                        InitSchemas(property, pdm);
+                        break;
+                    case Const.CDefaultGroups:
+                        InitGroups(property, pdm);
+                        break;
+                    case Const.CTargetModels:
                         break;
                 }
             }
@@ -163,6 +175,32 @@ namespace Bing.Pdm.Core.Loaders
             foreach (XmlNode package in packages)
             {
                 pdm.Packages.Add(_context.PackageLoader.GetPackage(package));
+            }
+        }
+
+        /// <summary>
+        /// 初始化架构信息
+        /// </summary>
+        /// <param name="schemas">架构节点集合</param>
+        /// <param name="pdm">PDM信息</param>
+        private void InitSchemas(XmlNode schemas, PdmInfo pdm)
+        {
+            foreach (XmlNode schema in schemas)
+            {
+                pdm.Schemas.Add(_context.SchemaLoader.GetSchema(schema));
+            }
+        }
+
+        /// <summary>
+        /// 初始化组信息
+        /// </summary>
+        /// <param name="groups">组节点集合</param>
+        /// <param name="pdm">PDM信息</param>
+        private void InitGroups(XmlNode groups, PdmInfo pdm)
+        {
+            foreach (XmlNode group in groups)
+            {
+                pdm.DefaultGroups.Add(_context.GroupLoader.GetGroup(group));
             }
         }
     }

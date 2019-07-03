@@ -78,5 +78,15 @@ namespace Bing.Pdm.Tests
             var result = _reader.ReadFromFile(_filePath);
             Output.WriteLine(result.Packages.ToJson());
         }
+
+        /// <summary>
+        /// 测试 默认组集合
+        /// </summary>
+        [Fact]
+        public void Test_Reader_DefaultGroups()
+        {
+            var result = _reader.ReadFromFile(_filePath);
+            Output.WriteLine(result.DefaultGroups.ToJson());
+        }
     }
 }

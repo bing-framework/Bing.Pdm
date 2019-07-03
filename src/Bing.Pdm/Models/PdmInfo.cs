@@ -63,5 +63,10 @@ namespace Bing.Pdm.Models
         /// 包集合
         /// </summary>
         public IList<PackageInfo> Packages { get; set; } = new List<PackageInfo>();
+
+        /// <summary>
+        /// 默认组集合
+        /// </summary>
+        public IList<GroupInfo> DefaultGroups { get; set; } = new List<GroupInfo>();
     }
 }
