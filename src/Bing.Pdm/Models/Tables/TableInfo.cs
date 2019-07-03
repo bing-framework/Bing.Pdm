@@ -53,7 +53,7 @@ namespace Bing.Pdm.Models.Tables
         /// 物理选项
         /// </summary>
         public string PhysicalOptions { get; set; }
-
+        
         /// <summary>
         /// 初始化一个<see cref="TableInfo"/>类型的实例
         /// </summary>

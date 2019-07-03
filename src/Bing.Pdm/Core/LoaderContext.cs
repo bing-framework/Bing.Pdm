@@ -40,6 +40,11 @@ namespace Bing.Pdm.Core
         public IPdmLoader PdmLoader { get; }
 
         /// <summary>
+        /// DBMS加载器
+        /// </summary>
+        public IDbmsLoader DbmsLoader { get; }
+
+        /// <summary>
         /// 初始化一个<see cref="LoaderContext"/>类型的实例
         /// </summary>
         public LoaderContext()
@@ -49,6 +54,7 @@ namespace Bing.Pdm.Core
             PackageLoader = new PackageLoader();
             TableLoader = new TableLoader(KeyLoader);
             ViewLoader = new ViewLoader();
+            DbmsLoader = new DbmsLoader();
             PdmLoader = new PdmLoader(this);
         }
     }

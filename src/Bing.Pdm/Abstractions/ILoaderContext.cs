@@ -36,5 +36,10 @@ namespace Bing.Pdm.Abstractions
         /// PDM加载器
         /// </summary>
         IPdmLoader PdmLoader { get; }
+
+        /// <summary>
+        /// DBMS加载器
+        /// </summary>
+        IDbmsLoader DbmsLoader { get; }
     }
 }

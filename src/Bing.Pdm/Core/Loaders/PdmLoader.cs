@@ -42,55 +42,56 @@ namespace Bing.Pdm.Core.Loaders
 
             var pdmInfo = new PdmInfo();
             var pdmNode = xmlDoc.SelectSingleNode($"//{Const.CChildren}/{Const.OModel}", xmlnsManager);
-            if (pdmNode != null)
-            {
-                pdmInfo = GetPdm(pdmNode);
-            }
+            if (pdmNode == null)
+                return pdmInfo;
+            return GetPdm(pdmNode);
+            //if (pdmNode != null)
+            //{
+            //    pdmInfo = GetPdm(pdmNode);
+            //}
 
-            // 读取所有架构节点
-            var schemaList = xmlDoc.SelectNodes($"//{Const.CUsers}", xmlnsManager);
-            if (schemaList != null)
-            {
-                foreach (XmlNode schemas in schemaList)
-                {
-                    foreach (XmlNode schema in schemas.ChildNodes)
-                    {
-                        pdmInfo.Schemas.Add(_context.SchemaLoader.GetSchema(schema));
-                    }
-                }
-            }
+            //// 读取所有架构节点
+            //var schemaList = xmlDoc.SelectNodes($"//{Const.CUsers}", xmlnsManager);
+            //if (schemaList != null)
+            //{
+            //    foreach (XmlNode schemas in schemaList)
+            //    {
+            //        foreach (XmlNode schema in schemas.ChildNodes)
+            //        {
+            //            pdmInfo.Schemas.Add(_context.SchemaLoader.GetSchema(schema));
+            //        }
+            //    }
+            //}
 
-            // 读取所有表节点
-            var tableList = xmlDoc.SelectNodes($"//{Const.CTables}", xmlnsManager);
-            if (tableList != null)
-            {
-                foreach (XmlNode tables in tableList)
-                {
-                    foreach (XmlNode table in tables.ChildNodes)
-                    {
-                        // 排除快捷对象
-                        if (table.Name != "o:Shortcut")
-                        {
-                            pdmInfo.Tables.Add(_context.TableLoader.GetTable(table));
-                        }
-                    }
-                }
-            }
+            //// 读取所有表节点
+            //var tableList = xmlDoc.SelectNodes($"//{Const.CTables}", xmlnsManager);
+            //if (tableList != null)
+            //{
+            //    foreach (XmlNode tables in tableList)
+            //    {
+            //        foreach (XmlNode table in tables.ChildNodes)
+            //        {
+            //            // 排除快捷对象
+            //            if (table.Name != "o:Shortcut")
+            //            {
+            //                pdmInfo.Tables.Add(_context.TableLoader.GetTable(table));
+            //            }
+            //        }
+            //    }
+            //}
 
-            // 读取所有视图节点
-            var viewList = xmlDoc.SelectNodes($"//{Const.CViews}", xmlnsManager);
-            if (viewList != null)
-            {
-                foreach (XmlNode views in viewList)
-                {
-                    foreach (XmlNode view in views.ChildNodes)
-                    {
-                        pdmInfo.Views.Add(_context.ViewLoader.GetView(view));
-                    }
-                }
-            }
-
-            return pdmInfo;
+            //// 读取所有视图节点
+            //var viewList = xmlDoc.SelectNodes($"//{Const.CViews}", xmlnsManager);
+            //if (viewList != null)
+            //{
+            //    foreach (XmlNode views in viewList)
+            //    {
+            //        foreach (XmlNode view in views.ChildNodes)
+            //        {
+            //            pdmInfo.Views.Add(_context.ViewLoader.GetView(view));
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
@@ -107,11 +108,23 @@ namespace Bing.Pdm.Core.Loaders
                 property.CommonInfoHandle(pdm);
                 switch (property.Name)
                 {
+                    case Const.APackageOptionsText:
+                        pdm.PackageOptionsText = property.InnerText;
+                        break;
+                    case Const.AModelOptionsText:
+                        pdm.ModelOptionsText = property.InnerText;
+                        break;
                     case Const.AAuthor:
                         pdm.Author = property.InnerText;
                         break;
                     case Const.AVersion:
                         pdm.Version = property.InnerText;
+                        break;
+                    case Const.ARepositoryFilename:
+                        pdm.RepositoryFileName = property.InnerText;
+                        break;
+                    case Const.CDBMS:
+                        InitDbms(property,pdm);
                         break;
                     case Const.CPackages:
                         InitPackages(property, pdm);
@@ -120,6 +133,24 @@ namespace Bing.Pdm.Core.Loaders
             }
 
             return pdm;
+        }
+
+        /// <summary>
+        /// 初始化DBMS
+        /// </summary>
+        /// <param name="dbms">DBMS节点集合</param>
+        /// <param name="pdm">PDM信息</param>
+        private void InitDbms(XmlNode dbms, PdmInfo pdm)
+        {
+            foreach (XmlNode node in dbms)
+            {
+                var result = _context.DbmsLoader.GetDbms(node);
+                if (result != null)
+                {
+                    pdm.Dbms = result;
+                    return;
+                }
+            }
         }
 
         /// <summary>

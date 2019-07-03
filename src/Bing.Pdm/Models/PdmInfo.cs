@@ -15,6 +15,16 @@ namespace Bing.Pdm.Models
         public string PdmId { get; set; }
 
         /// <summary>
+        /// 包选项文本
+        /// </summary>
+        public string PackageOptionsText { get; set; }
+
+        /// <summary>
+        /// 实体选项文本
+        /// </summary>
+        public string ModelOptionsText { get; set; }
+
+        /// <summary>
         /// 作者
         /// </summary>
         public string Author { get; set; }
@@ -23,6 +33,16 @@ namespace Bing.Pdm.Models
         /// 版本号
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 仓储文件名
+        /// </summary>
+        public string RepositoryFileName { get; set; }
+
+        /// <summary>
+        /// DBMS信息
+        /// </summary>
+        public DbmsInfo Dbms { get; set; }
 
         /// <summary>
         /// 架构集合
