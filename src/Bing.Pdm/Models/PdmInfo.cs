@@ -68,5 +68,10 @@ namespace Bing.Pdm.Models
         /// 默认组集合
         /// </summary>
         public IList<GroupInfo> DefaultGroups { get; set; } = new List<GroupInfo>();
+
+        /// <summary>
+        /// 物理图集合
+        /// </summary>
+        public IList<PhysicalDiagramInfo> PhysicalDiagrams { get; set; } = new List<PhysicalDiagramInfo>();
     }
 }

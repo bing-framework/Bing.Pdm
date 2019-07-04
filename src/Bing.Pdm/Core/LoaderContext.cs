@@ -50,17 +50,32 @@ namespace Bing.Pdm.Core
         public IGroupLoader GroupLoader { get; }
 
         /// <summary>
+        /// 物理图加载器
+        /// </summary>
+        public IPhysicalDiagramLoader PhysicalDiagramLoader { get; }
+
+        /// <summary>
+        /// 引用加载器
+        /// </summary>
+        public IReferenceLoader ReferenceLoader { get; }
+
+        /// <summary>
         /// 初始化一个<see cref="LoaderContext"/>类型的实例
         /// </summary>
         public LoaderContext()
         {
             KeyLoader = new KeyLoader();
-            SchemaLoader = new SchemaLoader();
-            PackageLoader = new PackageLoader();
-            TableLoader = new TableLoader(KeyLoader);
-            ViewLoader = new ViewLoader();
+            ReferenceLoader = new ReferenceLoader();
             DbmsLoader = new DbmsLoader();
             GroupLoader = new GroupLoader();
+            PhysicalDiagramLoader = new PhysicalDiagramLoader();
+            ViewLoader = new ViewLoader();
+            SchemaLoader = new SchemaLoader();
+
+            TableLoader = new TableLoader(KeyLoader);
+            PackageLoader = new PackageLoader(TableLoader, ReferenceLoader);
+            
+
             PdmLoader = new PdmLoader(this);
         }
     }

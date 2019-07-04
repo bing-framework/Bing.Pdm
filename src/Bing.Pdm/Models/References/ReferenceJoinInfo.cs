@@ -1,26 +1,21 @@
 ﻿using System;
 
-namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models.References
 {
     /// <summary>
-    /// Pdm通用信息
+    /// 引用关联信息
     /// </summary>
-    public abstract class PdmCommonInfo : ICreationAudited, IModifierAudited, IObjectId
+    public class ReferenceJoinInfo:IObjectId,ICreationAudited,IModifierAudited
     {
+        /// <summary>
+        /// 引用关联标识
+        /// </summary>
+        public string ReferenceJoinId { get; set; }
+
         /// <summary>
         /// 对象标识
         /// </summary>
         public string ObjectId { get; set; }
-
-        /// <summary>
-        /// 名称
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 代码
-        /// </summary>
-        public string Code { get; set; }
 
         /// <summary>
         /// 创建日期
@@ -41,5 +36,16 @@ namespace Bing.Pdm.Models
         /// 修改人
         /// </summary>
         public string Modifier { get; set; }
+
+        /// <summary>
+        /// 父表列标识
+        /// </summary>
+        public string ParentTableColumnId { get; set; }
+
+        /// <summary>
+        /// 子表列标识
+        /// </summary>
+        public string ChildTableColumnId { get; set; }
+
     }
 }

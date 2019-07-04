@@ -46,5 +46,15 @@ namespace Bing.Pdm.Abstractions
         /// 组加载器
         /// </summary>
         IGroupLoader GroupLoader { get; }
+
+        /// <summary>
+        /// 物理图加载器
+        /// </summary>
+        IPhysicalDiagramLoader PhysicalDiagramLoader { get; }
+
+        /// <summary>
+        /// 引用加载器
+        /// </summary>
+        IReferenceLoader ReferenceLoader { get; }
     }
 }

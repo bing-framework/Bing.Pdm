@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Bing.Pdm.Models.References;
+using Bing.Pdm.Models.Tables;
 
 namespace Bing.Pdm.Models
 {
@@ -21,5 +23,15 @@ namespace Bing.Pdm.Models
         /// 物理图集合
         /// </summary>
         public IList<PhysicalDiagramInfo> PhysicalDiagrams { get; private set; } = new List<PhysicalDiagramInfo>();
+
+        /// <summary>
+        /// 表集合
+        /// </summary>
+        public IList<TableInfo> Tables { get; private set; } = new List<TableInfo>();
+
+        /// <summary>
+        /// 引用集合
+        /// </summary>
+        public IList<ReferenceInfo> References { get; private set; } = new List<ReferenceInfo>();
     }
 }

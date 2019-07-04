@@ -1,5 +1,6 @@
 ﻿using Bing.Pdm.Parser;
 using Bing.Pdm.Reader;
+using Bing.Utils.IO;
 using Bing.Utils.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,20 +31,21 @@ namespace Bing.Pdm.Tests
         }
 
         /// <summary>
-        /// 测试PDM分析
+        /// 测试 PDM信息
         /// </summary>
         [Fact]
         public void Test_Parser()
         {
-            var result = _parser.Parser(_filePath);
-            Output.WriteLine(result.ToJson());
+            var result = _reader.ReadFromFile(_filePath);
+            FileHelper.Write("D:\\test\\物流平台.json", result.ToJson());
+            //Output.WriteLine(result.ToJson());
         }
 
         /// <summary>
         /// 测试 架构集合
         /// </summary>
         [Fact]
-        public void Test_Reader_Schema()
+        public void Test_Reader_Schemas()
         {
             var result = _reader.ReadFromFile(_filePath);
             Output.WriteLine(result.Schemas.ToJson());
@@ -53,7 +55,7 @@ namespace Bing.Pdm.Tests
         /// 测试 视图集合
         /// </summary>
         [Fact]
-        public void Test_Reader_View()
+        public void Test_Reader_Views()
         {
             var result = _reader.ReadFromFile(_filePath);
             Output.WriteLine(result.Views.ToJson());
@@ -63,7 +65,7 @@ namespace Bing.Pdm.Tests
         /// 测试 表集合
         /// </summary>
         [Fact]
-        public void Test_Reader_Table()
+        public void Test_Reader_Tables()
         {
             var result = _reader.ReadFromFile(_filePath);
             Output.WriteLine(result.Tables.ToJson());
@@ -73,7 +75,7 @@ namespace Bing.Pdm.Tests
         /// 测试 包集合
         /// </summary>
         [Fact]
-        public void Test_Reader_Package()
+        public void Test_Reader_Packages()
         {
             var result = _reader.ReadFromFile(_filePath);
             Output.WriteLine(result.Packages.ToJson());
@@ -87,6 +89,16 @@ namespace Bing.Pdm.Tests
         {
             var result = _reader.ReadFromFile(_filePath);
             Output.WriteLine(result.DefaultGroups.ToJson());
+        }
+
+        /// <summary>
+        /// 测试 物理图集合
+        /// </summary>
+        [Fact]
+        public void Test_Reader_PhysicalDiagrams()
+        {
+            var result = _reader.ReadFromFile(_filePath);
+            Output.WriteLine(result.PhysicalDiagrams.ToJson());
         }
     }
 }

@@ -109,10 +109,10 @@ namespace Bing.Pdm.Core.Loaders
                 switch (property.Name)
                 {
                     case Const.APackageOptionsText:
-                        pdm.PackageOptionsText = property.InnerText;
+                        //pdm.PackageOptionsText = property.InnerText;
                         break;
                     case Const.AModelOptionsText:
-                        pdm.ModelOptionsText = property.InnerText;
+                        //pdm.ModelOptionsText = property.InnerText;
                         break;
                     case Const.AAuthor:
                         pdm.Author = property.InnerText;
@@ -127,6 +127,7 @@ namespace Bing.Pdm.Core.Loaders
                         InitDbms(property,pdm);
                         break;
                     case Const.CPhysicalDiagrams:
+                        InitPhysicalDiagrams(property, pdm);
                         break;
                     case Const.CPackages:
                         InitPackages(property, pdm);
@@ -162,6 +163,19 @@ namespace Bing.Pdm.Core.Loaders
                     pdm.Dbms = result;
                     return;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 初始化物理图信息
+        /// </summary>
+        /// <param name="physicalDiagrams">物理图节点集合</param>
+        /// <param name="pdm">PDM信息</param>
+        private void InitPhysicalDiagrams(XmlNode physicalDiagrams, PdmInfo pdm)
+        {
+            foreach (XmlNode physicalDiagram in physicalDiagrams)
+            {
+                pdm.PhysicalDiagrams.Add(_context.PhysicalDiagramLoader.GetPhysicalDiagram(physicalDiagram));
             }
         }
 

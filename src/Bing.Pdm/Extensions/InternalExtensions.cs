@@ -42,6 +42,14 @@ namespace Bing.Pdm.Extensions
         }
 
         /// <summary>
+        /// 转换为Int64
+        /// </summary>
+        public static int ToInt(this string value)
+        {
+            return int.Parse(value);
+        }
+
+        /// <summary>
         /// 通用信息处理
         /// </summary>
         /// <typeparam name="T">类型</typeparam>
@@ -75,6 +83,7 @@ namespace Bing.Pdm.Extensions
                         pdmCommonInfo.Modifier = node.InnerText;
                         break;
                 }
+                return;
             }
 
             switch (node.Name)
@@ -84,6 +93,21 @@ namespace Bing.Pdm.Extensions
                     return;
                 case Const.ADescription when entity is IDescription description:
                     description.Description = node.InnerText;
+                    return;
+                case Const.ACreationDate when entity is ICreationAudited creationDate:
+                    creationDate.CreationDate = node.InnerText.ToDateTime();
+                    return;
+                case Const.ACreator when entity is ICreationAudited creationCreator:
+                    creationCreator.Creator = node.InnerText;
+                    return;
+                case Const.AModificationDate when entity is IModifierAudited modifierDate:
+                    modifierDate.ModificationDate = node.InnerText.ToDateTime();
+                    return;
+                case Const.AModifier when entity is IModifierAudited modifierModifier:
+                    modifierModifier.Modifier = node.InnerText;
+                    return;
+                case Const.AObjectId when entity is IObjectId objectId:
+                    objectId.ObjectId = node.InnerText;
                     return;
             }
         }
