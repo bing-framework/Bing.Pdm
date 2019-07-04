@@ -45,24 +45,6 @@ namespace Bing.Pdm.Core.Loaders
             if (pdmNode == null)
                 return pdmInfo;
             return GetPdm(pdmNode);
-            //if (pdmNode != null)
-            //{
-            //    pdmInfo = GetPdm(pdmNode);
-            //}
-
-            //// 读取所有架构节点
-            //var schemaList = xmlDoc.SelectNodes($"//{Const.CUsers}", xmlnsManager);
-            //if (schemaList != null)
-            //{
-            //    foreach (XmlNode schemas in schemaList)
-            //    {
-            //        foreach (XmlNode schema in schemas.ChildNodes)
-            //        {
-            //            pdmInfo.Schemas.Add(_context.SchemaLoader.GetSchema(schema));
-            //        }
-            //    }
-            //}
-
             //// 读取所有表节点
             //var tableList = xmlDoc.SelectNodes($"//{Const.CTables}", xmlnsManager);
             //if (tableList != null)
@@ -141,6 +123,7 @@ namespace Bing.Pdm.Core.Loaders
                         InitGroups(property, pdm);
                         break;
                     case Const.CTargetModels:
+                        InitTargetModels(property, pdm);
                         break;
                 }
             }
@@ -215,6 +198,19 @@ namespace Bing.Pdm.Core.Loaders
             foreach (XmlNode group in groups)
             {
                 pdm.DefaultGroups.Add(_context.GroupLoader.GetGroup(group));
+            }
+        }
+
+        /// <summary>
+        /// 初始化目标模型信息
+        /// </summary>
+        /// <param name="targetModels">目标模型节点集合</param>
+        /// <param name="pdm">PDM信息</param>
+        private void InitTargetModels(XmlNode targetModels, PdmInfo pdm)
+        {
+            foreach (XmlNode targetModel in targetModels)
+            {
+                pdm.TargetModels.Add(_context.TargetModelLoader.GetTargetModel(targetModel));
             }
         }
     }

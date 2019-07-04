@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Bing.Pdm.Models.PhysicalDiagrams;
 using Bing.Pdm.Models.References;
 using Bing.Pdm.Models.Tables;
 

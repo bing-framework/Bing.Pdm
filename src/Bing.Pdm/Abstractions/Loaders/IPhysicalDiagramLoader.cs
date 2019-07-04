@@ -1,5 +1,6 @@
 ﻿using System.Xml;
-using Bing.Pdm.Models;
+using Bing.Pdm.Models.Others;
+using Bing.Pdm.Models.PhysicalDiagrams;
 
 namespace Bing.Pdm.Abstractions.Loaders
 {

@@ -1,4 +1,4 @@
-﻿namespace Bing.Pdm.Models
+﻿namespace Bing.Pdm.Models.Others
 {
     /// <summary>
     /// 组信息

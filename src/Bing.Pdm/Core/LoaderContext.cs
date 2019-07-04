@@ -60,6 +60,11 @@ namespace Bing.Pdm.Core
         public IReferenceLoader ReferenceLoader { get; }
 
         /// <summary>
+        /// 目标模型加载器
+        /// </summary>
+        public ITargetModelLoader TargetModelLoader { get; }
+
+        /// <summary>
         /// 初始化一个<see cref="LoaderContext"/>类型的实例
         /// </summary>
         public LoaderContext()
@@ -71,11 +76,11 @@ namespace Bing.Pdm.Core
             PhysicalDiagramLoader = new PhysicalDiagramLoader();
             ViewLoader = new ViewLoader();
             SchemaLoader = new SchemaLoader();
+            TargetModelLoader = new TargetModelLoader();
 
             TableLoader = new TableLoader(KeyLoader);
             PackageLoader = new PackageLoader(TableLoader, ReferenceLoader);
             
-
             PdmLoader = new PdmLoader(this);
         }
     }

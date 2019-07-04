@@ -56,5 +56,10 @@ namespace Bing.Pdm.Abstractions
         /// 引用加载器
         /// </summary>
         IReferenceLoader ReferenceLoader { get; }
+
+        /// <summary>
+        /// 目标模型加载器
+        /// </summary>
+        ITargetModelLoader TargetModelLoader { get; }
     }
 }

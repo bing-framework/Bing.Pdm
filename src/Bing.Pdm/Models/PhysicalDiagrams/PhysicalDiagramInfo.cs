@@ -1,4 +1,4 @@
-﻿namespace Bing.Pdm.Models
+﻿namespace Bing.Pdm.Models.PhysicalDiagrams
 {
     /// <summary>
     /// 物理图信息

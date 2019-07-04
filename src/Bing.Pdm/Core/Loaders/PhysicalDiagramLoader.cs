@@ -1,7 +1,8 @@
 ﻿using System.Xml;
 using Bing.Pdm.Abstractions.Loaders;
 using Bing.Pdm.Extensions;
-using Bing.Pdm.Models;
+using Bing.Pdm.Models.Others;
+using Bing.Pdm.Models.PhysicalDiagrams;
 
 namespace Bing.Pdm.Core.Loaders
 {
