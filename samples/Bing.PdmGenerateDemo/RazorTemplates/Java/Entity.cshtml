@@ -2,8 +2,29 @@
 @using SmartCode.Db
 @model BuildContext
 @{
-    Layout = null;
+    Layout = "_JavaLayout.cshtml";
     var project = Model.Project;
     var buildTask = Model.Build;
     var table = Model.GetCurrentTable();
+}
+隔壁老萌
+package @(project.Module).@buildTask.Module;
+import java.security.Timestamp;
+/**
+* @(table.Description ?? table.ConvertedName)
+*/
+{
+@foreach (var column in table.Columns)
+{
+    <text>
+        public @column get@(NamingUtil.PascalCase(column.ConvertedName))(){
+        return @column.ConvertedName ;
+        }
+
+        public void set@(NamingUtil.PascalCase(column.ConvertedName))(@column.ConvertedName){
+        this.@column.ConvertedName = @column.ConvertedName;
+        }
+    </text>
+
+}
 }

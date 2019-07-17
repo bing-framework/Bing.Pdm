@@ -32,7 +32,6 @@ namespace Bing.PdmGenerateDemo
 
                     #region Auto Inject
                     var services = smartCodeOptions.Services;
-
                     services.AddSingleton(smartCodeOptions);
                     services.AddSingleton<IPluginManager, PluginManager>();
                     services.AddSingleton<IProjectBuilder, ProjectBuilder>();
@@ -117,7 +116,7 @@ namespace Bing.PdmGenerateDemo
                     Console.WriteLine(ex.Message);
                 }
             });
-
+            Console.WriteLine("来源隔壁老萌的新手大礼包");
             Console.ReadLine();
         }
     }

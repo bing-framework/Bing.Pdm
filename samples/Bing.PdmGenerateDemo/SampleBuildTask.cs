@@ -33,11 +33,13 @@ namespace Bing.PdmGenerateDemo
             {
                 new Column()
                 {
-                    Name = "Name"
+                    Name = "Name",
+                    ConvertedName = "隔壁名称"
                 },
                 new Column()
                 {
-                    Name = "Agent"
+                    Name = "Agent",
+                    ConvertedName = "代理名称"
                 }
             };
 
