@@ -1,0 +1,9 @@
+﻿@using SmartCode
+@using SmartCode.Db
+@model BuildContext
+@{
+    Layout = null;
+    var project = Model.Project;
+    var buildTask = Model.Build;
+    var table = Model.GetCurrentTable();
+}

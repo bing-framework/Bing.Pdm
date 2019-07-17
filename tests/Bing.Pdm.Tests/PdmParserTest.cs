@@ -1,4 +1,4 @@
-﻿using Bing.Pdm.Parser;
+﻿//using Bing.Pdm.Parser;
 using Bing.Pdm.Reader;
 using Bing.Utils.IO;
 using Bing.Utils.Json;
@@ -9,10 +9,10 @@ namespace Bing.Pdm.Tests
 {
     public class PdmParserTest : TestBase
     {
-        /// <summary>
-        /// 分析器
-        /// </summary>
-        private IPdmParser _parser;
+        ///// <summary>
+        ///// 分析器
+        ///// </summary>
+        //private IPdmParser _parser;
 
         /// <summary>
         /// 读取器
@@ -26,7 +26,7 @@ namespace Bing.Pdm.Tests
 
         public PdmParserTest(ITestOutputHelper output) : base(output)
         {
-            _parser = new PdmParser();
+            //_parser = new PdmParser();
             _reader = new PdmReader();
         }
 
