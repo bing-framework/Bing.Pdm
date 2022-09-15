@@ -5,11 +5,18 @@ namespace Bing.Pdm.Models
     /// <summary>
     /// Pdm通用信息
     /// </summary>
-    public abstract class PdmCommonInfo : ICreationAudited, IModifierAudited, IObjectId
+    public abstract class PdmCommonInfo : ICreationAudited, IModifierAudited, IObjectId, IComment
     {
+        /// <summary>
+        /// 标识
+        /// </summary>
+        [NodeAttribute]
+        public string Id { get; set; }
+
         /// <summary>
         /// 对象标识
         /// </summary>
+        [NodeAlias("a:ObjectID")]
         public string ObjectId { get; set; }
 
         /// <summary>
@@ -41,5 +48,10 @@ namespace Bing.Pdm.Models
         /// 修改人
         /// </summary>
         public string Modifier { get; set; }
+
+        /// <summary>
+        /// 注释
+        /// </summary>
+        public string Comment { get; set; }
     }
 }

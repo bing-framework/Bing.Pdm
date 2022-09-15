@@ -171,7 +171,7 @@ namespace Bing.Pdm.Core.Loaders
         {
             foreach (XmlNode package in packages)
             {
-                pdm.Packages.Add(_context.PackageLoader.GetPackage(package));
+                pdm.PackageInfos.Add(_context.PackageLoader.GetPackage(package));
             }
         }
 

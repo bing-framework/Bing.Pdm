@@ -13,11 +13,6 @@ namespace Bing.Pdm.Models.Views
         public string ViewColumnId { get; set; }
 
         /// <summary>
-        /// 注释
-        /// </summary>
-        public string Comment { get; set; }
-
-        /// <summary>
         /// 描述
         /// </summary>
         public string Description { get; set; }

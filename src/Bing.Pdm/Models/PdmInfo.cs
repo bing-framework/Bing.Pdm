@@ -55,9 +55,22 @@ namespace Bing.Pdm.Models
         public IList<PhysicalDiagramInfo> PhysicalDiagrams { get; set; } = new List<PhysicalDiagramInfo>();
 
         /// <summary>
-        /// 包集合
+        /// 包信息列表
         /// </summary>
-        public IList<PackageInfo> Packages { get; set; } = new List<PackageInfo>();
+        [ChildObject("c:Packages", typeof(PackageInfo))]
+        public List<PackageInfo> PackageInfos { get; set; }
+
+        /// <summary>
+        /// 表信息列表
+        /// </summary>
+        [ChildObject("c:Packages", typeof(TableInfo))]
+        public List<TableInfo> TableInfos { get; set; }
+
+        /// <summary>
+        /// 引用信息列表
+        /// </summary>
+        [ChildObject("c:References", typeof(ReferenceInfo))]
+        public List<ReferenceInfo> ReferenceInfos { get; set; }
 
         /// <summary>
         /// 架构集合
@@ -74,20 +87,20 @@ namespace Bing.Pdm.Models
         /// </summary>
         public IList<TargetModelInfo> TargetModels { get; set; } = new List<TargetModelInfo>();
 
-        /// <summary>
-        /// 表集合
-        /// </summary>
-        public IList<TableInfo> Tables => Packages.SelectMany(x => x.Tables.Select(t => t)).ToList();
+        ///// <summary>
+        ///// 表集合
+        ///// </summary>
+        //public IList<TableInfo> Tables => PackageInfos.SelectMany(x => x.Tables.Select(t => t)).ToList();
 
         /// <summary>
         /// 视图集合
         /// </summary>
         public IList<ViewInfo> Views { get; set; } = new List<ViewInfo>();
 
-        /// <summary>
-        /// 引用集合
-        /// </summary>
-        public IList<ReferenceInfo> References => Packages.SelectMany(x => x.References.Select(t => t)).ToList();
+        ///// <summary>
+        ///// 引用集合
+        ///// </summary>
+        //public IList<ReferenceInfo> References => PackageInfos.SelectMany(x => x.References.Select(t => t)).ToList();
 
         /// <summary>
         /// 查找架构
@@ -104,34 +117,34 @@ namespace Bing.Pdm.Models
             return result;
         }
 
-        /// <summary>
-        /// 查找表
-        /// </summary>
-        /// <param name="tableId">表标识</param>
-        public TableInfo FindTable(string tableId)
-        {
-            var result = Tables.FirstOrDefault(x => x.TableId == tableId);
-            if (result == null)
-            {
-                throw new ArgumentException($"{tableId} Table Not Found.");
-            }
+        ///// <summary>
+        ///// 查找表
+        ///// </summary>
+        ///// <param name="tableId">表标识</param>
+        //public TableInfo FindTable(string tableId)
+        //{
+        //    var result = Tables.FirstOrDefault(x => x.TableId == tableId);
+        //    if (result == null)
+        //    {
+        //        throw new ArgumentException($"{tableId} Table Not Found.");
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        /// <summary>
-        /// 查找引用
-        /// </summary>
-        /// <param name="referenceId">引用标识</param>
-        public ReferenceInfo FindReference(string referenceId)
-        {
-            var result = References.FirstOrDefault(x => x.ReferenceId == referenceId);
-            if (result == null)
-            {
-                throw new ArgumentException($"{referenceId} Reference Not Found.");
-            }
+        ///// <summary>
+        ///// 查找引用
+        ///// </summary>
+        ///// <param name="referenceId">引用标识</param>
+        //public ReferenceInfo FindReference(string referenceId)
+        //{
+        //    var result = References.FirstOrDefault(x => x.ReferenceId == referenceId);
+        //    if (result == null)
+        //    {
+        //        throw new ArgumentException($"{referenceId} Reference Not Found.");
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }

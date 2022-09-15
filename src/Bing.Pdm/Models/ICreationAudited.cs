@@ -2,6 +2,9 @@
 
 namespace Bing.Pdm.Models
 {
+    /// <summary>
+    /// 创建人审计
+    /// </summary>
     public interface ICreationAudited
     {
         /// <summary>

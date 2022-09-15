@@ -1,51 +1,20 @@
-﻿using System;
-
-namespace Bing.Pdm.Models.References
+﻿namespace Bing.Pdm.Models.References
 {
     /// <summary>
     /// 引用关联信息
     /// </summary>
-    public class ReferenceJoinInfo:IObjectId,ICreationAudited,IModifierAudited
+    public class ReferenceJoinInfo : PdmCommonInfo
     {
         /// <summary>
-        /// 引用关联标识
+        /// 父表列
         /// </summary>
-        public string ReferenceJoinId { get; set; }
+        [ChildObject("c:Object1")]
+        public RefInfo ParentTableColumn { get; set; }
 
         /// <summary>
-        /// 对象标识
+        /// 子表列引用
         /// </summary>
-        public string ObjectId { get; set; }
-
-        /// <summary>
-        /// 创建日期
-        /// </summary>
-        public DateTime CreationDate { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string Creator { get; set; }
-
-        /// <summary>
-        /// 修改日期
-        /// </summary>
-        public DateTime ModificationDate { get; set; }
-
-        /// <summary>
-        /// 修改人
-        /// </summary>
-        public string Modifier { get; set; }
-
-        /// <summary>
-        /// 父表列标识
-        /// </summary>
-        public string ParentTableColumnId { get; set; }
-
-        /// <summary>
-        /// 子表列标识
-        /// </summary>
-        public string ChildTableColumnId { get; set; }
-
+        [ChildObject("c:Object1")]
+        public RefInfo ChildTableColumn { get; set; }
     }
 }

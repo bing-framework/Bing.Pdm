@@ -68,7 +68,7 @@ namespace Bing.Pdm.Tests
         public void Test_Reader_Tables()
         {
             var result = _reader.ReadFromFile(_filePath);
-            Output.WriteLine(result.Tables.ToJson());
+            //Output.WriteLine(result.Tables.ToJson());
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Bing.Pdm.Tests
         public void Test_Reader_Packages()
         {
             var result = _reader.ReadFromFile(_filePath);
-            Output.WriteLine(result.Packages.ToJson());
+            Output.WriteLine(result.PackageInfos.ToJson());
         }
 
         /// <summary>

@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Bing.Pdm.Models.Keys;
+using Bing.Pdm.Models.References;
 
 namespace Bing.Pdm.Models.Tables
 {
     /// <summary>
     /// 表信息
     /// </summary>
-    public class TableInfo : PdmCommonInfo, IComment, IDescription
+    public class TableInfo : PdmCommonInfo, IDescription
     {
         /// <summary>
         /// 表标识
@@ -15,86 +16,162 @@ namespace Bing.Pdm.Models.Tables
         public string TableId { get; set; }
 
         /// <summary>
-        /// 注释
-        /// </summary>
-        public string Comment { get; set; }
-
-        /// <summary>
         /// 描述
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// 字段列表
+        /// 字段信息列表
         /// </summary>
-        public IList<ColumnInfo> Columns { get; private set; }
+        [ChildObject("c:ColumnInfos", typeof(ColumnInfo))]
+        public List<ColumnInfo> ColumnInfos { get; set; }
 
         /// <summary>
-        /// 键列表
+        /// 键信息列表（主键）
         /// </summary>
-        public IList<KeyInfo> Keys { get; private set; }
+        [ChildObject("c:KeyInfos", typeof(KeyInfo))]
+        public List<KeyInfo> KeyInfos { get; set; }
 
         /// <summary>
-        /// 索引列表
+        /// 主键列表
         /// </summary>
-        public IList<IndexInfo> Indexes { get; private set; }
+        [ChildObject("c:PrimaryKey", typeof(RefInfo))]
+        public List<RefInfo> PrimaryKeys { get; set; }
 
         /// <summary>
-        /// 主键Key代码.=>KeyId
+        /// 索引信息列表
         /// </summary>
-        public string PrimaryKeyRefCode { get; set; }
+        [ChildObject("c:Indexes", typeof(KeyInfo))]
+        public List<IndexInfo> IndexInfos { get; set; }
 
         /// <summary>
-        /// 主关键字
+        /// 子表信息列表
         /// </summary>
-        public KeyInfo PrimaryKey => Keys.FirstOrDefault(key => key.KeyId == PrimaryKeyRefCode);
+        public List<ChildTableInfo> ChildTableInfos { get; set; }
+
+        /// <summary>
+        /// 引用表信息列表
+        /// </summary>
+        public List<ReferenceTableInfo> ReferenceTableInfos { get; set; }
+
+        /// <summary>
+        /// 表名
+        /// </summary>
+        private string _tableName;
+
+        /// <summary>
+        /// 是否已初始化表名
+        /// </summary>
+        private bool _isTableNameInit;
+
+        /// <summary>
+        /// 表名
+        /// </summary>
+        public string TableName
+        {
+            get
+            {
+                if (_isTableNameInit)
+                    return _tableName;
+
+                var index = Code.LastIndexOf('_');
+                _tableName = Code.Substring(index + 1);
+                _isTableNameInit = true;
+
+                return _tableName;
+            }
+        }
+
+        /// <summary>
+        /// 主键代码
+        /// </summary>
+        private string _primaryKeyCode;
+
+        /// <summary>
+        /// 是否已初始化主键代码
+        /// </summary>
+        private bool _isPrimaryKeyCodeInit;
+
+        /// <summary>
+        /// 主键代码
+        /// </summary>
+        public string PrimaryKeyCode
+        {
+            get
+            {
+                if (_isPrimaryKeyCodeInit)
+                    return _primaryKeyCode;
+
+                var primaryKey = PrimaryKeys.FirstOrDefault();
+                if (primaryKey == null)
+                    return string.Empty;
+
+                var keyInfo = KeyInfos.FirstOrDefault(x => x.Id == primaryKey.Ref);
+                var key = keyInfo?.Columns.FirstOrDefault();
+                if (key == null)
+                    return string.Empty;
+
+                var column = ColumnInfos.FirstOrDefault(x => x.Id == key.Ref);
+                if (column == null)
+                    return string.Empty;
+
+                _primaryKeyCode = column.Code;
+                _isPrimaryKeyCodeInit = true;
+
+                return _primaryKeyCode;
+            }
+        }
 
         /// <summary>
         /// 物理选项
         /// </summary>
         public string PhysicalOptions { get; set; }
-        
+    }
+
+    /// <summary>
+    /// 子表信息
+    /// </summary>
+    public class ChildTableInfo
+    {
         /// <summary>
-        /// 初始化一个<see cref="TableInfo"/>类型的实例
+        /// 外键
         /// </summary>
-        public TableInfo()
-        {
-            Keys = new List<KeyInfo>();
-            Columns = new List<ColumnInfo>();
-            Indexes = new List<IndexInfo>();
-        }
+        public ColumnInfo ForeignKey { get; set; }
 
         /// <summary>
-        /// 添加字段
+        /// 子表
         /// </summary>
-        /// <param name="column">字段信息</param>
-        public void AddColumn(ColumnInfo column)
-        {
-            if (Columns == null)
-                Columns = new List<ColumnInfo>();
-            Columns.Add(column);
-        }
+        public TableInfo ChildTable { get; set; }
 
         /// <summary>
-        /// 添加键
+        /// 子属性名称
         /// </summary>
-        /// <param name="key">键信息</param>
-        public void AddKey(KeyInfo key)
-        {
-            if (Keys == null)
-                Keys = new List<KeyInfo>();
-            Keys.Add(key);
-        }
+        public string ChildPropertyName { get; set; }
+    }
+
+    /// <summary>
+    /// 引用表信息
+    /// </summary>
+    public class ReferenceTableInfo
+    {
+        /// <summary>
+        /// 父表
+        /// </summary>
+        public TableInfo ParentTable { get; set; }
 
         /// <summary>
-        /// 添加索引
+        /// 引用键
         /// </summary>
-        /// <param name="index">索引信息</param>
-        public void AddIndex(IndexInfo index)
-        {
-            if (Indexes == null)
-                Indexes = new List<IndexInfo>();
-            Indexes.Add(index);
-        }
+        public ColumnInfo ReferenceKey { get; set; }
+
+        /// <summary>
+        /// 外键
+        /// </summary>
+        public ColumnInfo ForeignKey { get; set; }
+
+        /// <summary>
+        /// 父属性名称
+        /// </summary>
+        public string ParentPropertyName { get; set; }
     }
 }

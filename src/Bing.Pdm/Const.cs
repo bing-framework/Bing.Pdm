@@ -158,9 +158,9 @@
 
         public const string OTable = "o:Table";
 
-        public const string CColumns = "c:Columns";
+        public const string CColumns = "c:ColumnInfos";
 
-        public const string CKeys = "c:Keys";
+        public const string CKeys = "c:KeyInfos";
 
         public const string COwner = "c:Owner";
 
@@ -170,7 +170,7 @@
 
         #endregion
 
-        #region Columns
+        #region ColumnInfos
 
         public const string OColumn = "o:Column";
 
@@ -186,11 +186,11 @@
 
         #endregion
 
-        #region Keys
+        #region KeyInfos
 
         public const string OKey = "o:Key";
 
-        public const string CKeyColumns = "c:Key.Columns";
+        public const string CKeyColumns = "c:Key.ColumnInfos";
 
         #endregion
 
@@ -274,7 +274,7 @@
 
         public const string OAttribute = "o:Attribute";
 
-        public const string CIndexes = "c:Indexes";
+        public const string CIndexes = "c:IndexeInfos";
 
         public const string OIndex = "o:Index";
 

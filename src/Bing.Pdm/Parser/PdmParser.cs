@@ -116,20 +116,20 @@
 //        //        table.Name = tableNode?.SelectSingleNode("a:Name", _xmlNsManager)?.InnerText;
 //        //        table.Code = tableNode?.SelectSingleNode("a:Code", _xmlNsManager)?.InnerText;
 //        //        // 添加Columns
-//        //        table.Columns = ColumnParser(tableNode);
+//        //        table.ColumnInfos = ColumnParser(tableNode);
 //        //        // 添加Key
-//        //        foreach (XmlNode keyNode in tableNode.SelectNodes("c:Keys/o:Key", _xmlNsManager))
+//        //        foreach (XmlNode keyNode in tableNode.SelectNodes("c:KeyInfos/o:Key", _xmlNsManager))
 //        //        {
 //        //            var key = new PdmKey();
 //        //            key.Id = keyNode.GetAttribute("Id");
 //        //            key.Name = keyNode?.SelectSingleNode("a:Name", _xmlNsManager)?.InnerText;
 //        //            key.Code = keyNode?.SelectSingleNode("a:Code", _xmlNsManager)?.InnerText;
-//        //            foreach (XmlNode columnNode in keyNode.SelectNodes("c:Key.Columns/o:Column",_xmlNsManager))
+//        //            foreach (XmlNode columnNode in keyNode.SelectNodes("c:Key.ColumnInfos/o:Column",_xmlNsManager))
 //        //            {
 //        //                var id = columnNode.GetAttribute("Ref");
-//        //                key.Columns.Add(table.FindColumn(id));
+//        //                key.ColumnInfos.Add(table.FindColumn(id));
 //        //            }
-//        //            table.Keys.Add(key);
+//        //            table.KeyInfos.Add(key);
 //        //        }
 //        //        // 添加PrimaryKey
 //        //        if (tableNode.SelectSingleNode("c:PrimaryKey/o:Key", _xmlNsManager) != null)
@@ -138,7 +138,7 @@
 //        //            table.PrimaryKey = table.FindKey(id);
 //        //        }
 //        //        // 添加Indexes
-//        //        foreach (XmlNode indexNode in tableNode.SelectNodes("c:Indexes/o:Index",_xmlNsManager))
+//        //        foreach (XmlNode indexNode in tableNode.SelectNodes("c:IndexeInfos/o:Index",_xmlNsManager))
 //        //        {
 //        //            var index = new PdmIndex();
 //        //            index.Id = indexNode.GetAttribute("Id");
@@ -165,7 +165,7 @@
 //        //private List<PdmColumn> ColumnParser(XmlNode node)
 //        //{
 //        //    var list = new List<PdmColumn>();
-//        //    foreach (XmlNode columnNode in node.SelectNodes("c:Columns/o:Column",_xmlNsManager))
+//        //    foreach (XmlNode columnNode in node.SelectNodes("c:ColumnInfos/o:Column",_xmlNsManager))
 //        //    {
 //        //        var column = new PdmColumn();
 //        //        column.Id = columnNode.GetAttribute("Id");

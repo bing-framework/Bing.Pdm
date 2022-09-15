@@ -8,28 +8,21 @@ namespace Bing.Pdm.Models.References
     public class ReferenceInfo : PdmCommonInfo
     {
         /// <summary>
-        /// 引用标识
+        /// 父表引用
         /// </summary>
-        public string ReferenceId { get; set; }
+        [ChildObject("c:ParentTable")]
+        public RefInfo ParentTable { get; set; }
 
         /// <summary>
-        /// 基数
+        /// 子表引用
         /// </summary>
-        public string Cardinality { get; set; }
-
-        /// <summary>
-        /// 父表标识
-        /// </summary>
-        public string ParentTableId { get; set; }
-
-        /// <summary>
-        /// 子表标识
-        /// </summary>
-        public string ChildTableId { get; set; }
+        [ChildObject("c:ChildTable")]
+        public RefInfo ChildTable { get; set; }
 
         /// <summary>
         /// 引用关联集合
         /// </summary>
-        public IList<ReferenceJoinInfo> Joins { get; private set; } = new List<ReferenceJoinInfo>();
+        [ChildObject("c:Joins", typeof(ReferenceJoinInfo))]
+        public List<ReferenceJoinInfo> ReferenceJoinInfos { get; set; }
     }
 }
