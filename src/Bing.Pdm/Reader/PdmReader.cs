@@ -1,32 +1,21 @@
-﻿using Bing.Pdm.Abstractions.Loaders;
-using Bing.Pdm.Core;
-using Bing.Pdm.Core.Loaders;
+using System.IO;
 using Bing.Pdm.Models;
 
 namespace Bing.Pdm.Reader
 {
     /// <summary>
-    /// PDM 读取器
+    /// 读取 PowerDesigner PDM 文件的默认实现。
     /// </summary>
-    public class PdmReader : IPdmReader
+    public sealed class PdmReader : IPdmReader
     {
-        /// <summary>
-        /// 加载器
-        /// </summary>
-        private readonly IPdmLoader _loader;
-
-        /// <summary>
-        /// 初始化一个<see cref="PdmReader"/>类型的实例
-        /// </summary>
-        public PdmReader()
+        /// <inheritdoc />
+        public PdmInfo ReadFromFile(string filePath)
         {
-            _loader = new PdmLoader(new LoaderContext());
+            using (var stream = File.OpenRead(filePath))
+                return Read(stream);
         }
 
-        /// <summary>
-        /// 读取指定PDM文件
-        /// </summary>
-        /// <param name="filePath">文件路径</param>
-        public PdmInfo ReadFromFile(string filePath) => _loader.GetPdm(filePath);
+        /// <inheritdoc />
+        public PdmInfo Read(Stream stream) => new PowerDesignerParser().Parse(stream);
     }
 }

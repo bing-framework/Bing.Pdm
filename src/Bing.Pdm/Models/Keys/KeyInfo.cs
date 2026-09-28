@@ -1,17 +1,15 @@
-﻿using System.Collections.Generic;
-using Bing.Pdm.Models.References;
+using System.Collections.Generic;
 
 namespace Bing.Pdm.Models.Keys
 {
     /// <summary>
-    /// 键信息
+    /// 表键的信息。
     /// </summary>
-    public class KeyInfo : PdmCommonInfo
+    public sealed class KeyInfo : PdmCommonInfo
     {
         /// <summary>
-        /// Key涉及的列
+        /// 获取键包含的列标识。
         /// </summary>
-        [ChildObject("c:Key.ColumnInfos", typeof(RefInfo))]
-        public List<RefInfo> Columns { get; set; }
+        public List<string> ColumnIds { get; } = new List<string>();
     }
 }

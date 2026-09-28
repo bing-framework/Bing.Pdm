@@ -1,0 +1,16 @@
+package {{Project.Module}}.{{Build.Module}};
+
+/** {{{Items.CurrentTable.Description}}} */
+public class {{Items.CurrentTable.ConvertedName}} {
+{{#each Items.CurrentTable.Columns}}
+    private Object {{ConvertedName}};
+
+    public Object get{{ConvertedName}}() {
+        return {{ConvertedName}};
+    }
+
+    public void set{{ConvertedName}}(Object value) {
+        this.{{ConvertedName}} = value;
+    }
+{{/each}}
+}

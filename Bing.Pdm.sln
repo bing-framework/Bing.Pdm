@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bing.Pdm", "src\Bing.Pdm\Bi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bing.Pdm.Tests", "tests\Bing.Pdm.Tests\Bing.Pdm.Tests.csproj", "{D0FB0282-4C6C-4A15-868D-D09988BB3E4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bing.PdmGenerateDemo", "samples\Bing.PdmGenerateDemo\Bing.PdmGenerateDemo.csproj", "{064B009C-818E-4C8C-AA07-7AAB9AC9E768}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bing.Pdm.Tool", "samples\Bing.Pdm.Tool\Bing.Pdm.Tool.csproj", "{064B009C-818E-4C8C-AA07-7AAB9AC9E768}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

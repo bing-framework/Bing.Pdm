@@ -1,20 +1,17 @@
-﻿namespace Bing.Pdm.Models.References
+namespace Bing.Pdm.Models.References
 {
     /// <summary>
-    /// 引用关联信息
+    /// 引用中的列关联信息。
     /// </summary>
-    public class ReferenceJoinInfo : PdmCommonInfo
+    public sealed class ReferenceJoinInfo : PdmCommonInfo
     {
         /// <summary>
-        /// 父表列
+        /// 获取或设置父表列标识。
         /// </summary>
-        [ChildObject("c:Object1")]
-        public RefInfo ParentTableColumn { get; set; }
-
+        public string ParentColumnId { get; set; }
         /// <summary>
-        /// 子表列引用
+        /// 获取或设置子表列标识。
         /// </summary>
-        [ChildObject("c:Object1")]
-        public RefInfo ChildTableColumn { get; set; }
+        public string ChildColumnId { get; set; }
     }
 }

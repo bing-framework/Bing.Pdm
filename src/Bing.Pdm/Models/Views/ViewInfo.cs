@@ -3,39 +3,39 @@
 namespace Bing.Pdm.Models.Views
 {
     /// <summary>
-    /// 视图信息
+    /// 视图信息。
     /// </summary>
     public class ViewInfo : PdmCommonInfo
     {
         /// <summary>
-        /// 视图标识
+        /// 获取或设置所属包标识。
         /// </summary>
-        public string ViewId { get; set; }
+        public string PackageId { get; set; }
 
         /// <summary>
-        /// 视图SQL
+        /// 获取或设置视图 SQL 查询。
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string ViewSQLQuery { get; set; }
 
         /// <summary>
-        /// 描述
+        /// 获取或设置视图描述。
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// 标签化的SQL查询
+        /// 获取或设置带标签的 SQL 查询。
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string TaggedSQLQuery { get; set; }
 
         /// <summary>
-        /// 视图列集合
+        /// 获取视图列集合。
         /// </summary>
         public List<ViewColumnInfo> Columns { get; private set; }
 
         /// <summary>
-        /// 初始化一个<see cref="ViewInfo"/>类型的实例
+        /// 初始化一个 <see cref="ViewInfo"/> 类型的实例。
         /// </summary>
         public ViewInfo()
         {

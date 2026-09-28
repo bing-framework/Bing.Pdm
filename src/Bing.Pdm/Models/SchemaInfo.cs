@@ -1,17 +1,16 @@
-﻿namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models
 {
     /// <summary>
-    /// 架构信息
+    /// 数据库模式信息。
     /// </summary>
-    public class SchemaInfo : PdmCommonInfo
+    public sealed class SchemaInfo : PdmCommonInfo
     {
         /// <summary>
-        /// 架构标识
+        /// 获取或设置模式标识。
         /// </summary>
         public string SchemaId { get; set; }
-
         /// <summary>
-        /// 声明类型
+        /// 获取或设置模式类型。
         /// </summary>
         public string StereoType { get; set; }
     }

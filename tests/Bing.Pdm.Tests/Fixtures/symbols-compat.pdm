@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Model xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
+  <o:RootObject Id="r1"><c:Children><o:Model Id="m1">
+    <a:Name>Symbol compatibility</a:Name><a:Code>SymbolCompat</a:Code>
+    <c:PhysicalDiagrams><o:PhysicalDiagram Id="d1">
+      <a:Name>Shapes</a:Name><c:Symbols>
+        <o:ArchitectureAreaSymbol Id="area"><a:Rect>((0,0),(1000,1000))</a:Rect><a:FillColor>16777215</a:FillColor><c:SubSymbols>
+          <o:EllipseSymbol Id="ellipse"><a:Rect>((100,100),(300,300))</a:Rect><a:LineColor>255</a:LineColor></o:EllipseSymbol>
+        </c:SubSymbols></o:ArchitectureAreaSymbol>
+        <o:NoteSymbol Id="note"><a:Rect>((500,100),(900,400))</a:Rect><a:Text>{\rtf1\ansi\ansicpg936 \'c4\'e3\'ba\'c3 \u38?}</a:Text><a:FillColor>65535</a:FillColor></o:NoteSymbol>
+        <o:TextSymbol Id="text"><a:Rect>((100,500),(500,700))</a:Rect><a:Text>Text &amp; &lt;shape&gt;</a:Text></o:TextSymbol>
+        <o:PredefinedSymbol Id="predefined"><a:Rect>((600,500),(900,800))</a:Rect><a:SymbolType>20</a:SymbolType></o:PredefinedSymbol>
+        <o:PolylineSymbol Id="polyline"><a:ListOfPoints>((100,100),(200,400),(500,400))</a:ListOfPoints><a:LineColor>65280</a:LineColor></o:PolylineSymbol>
+        <o:NoteLinkSymbol Id="note-link"><a:ListOfPoints>((300,200),(400,200),(500,250))</a:ListOfPoints><c:SourceSymbol><o:EllipseSymbol Ref="ellipse"/></c:SourceSymbol><c:DestinationSymbol><o:NoteSymbol Ref="note"/></c:DestinationSymbol></o:NoteLinkSymbol>
+        <o:ExtendedDependencySymbol Id="dependency"><a:ListOfPoints>((300,300),(500,500),(600,600))</a:ListOfPoints><c:SourceSymbol><o:EllipseSymbol Ref="ellipse"/></c:SourceSymbol><c:DestinationSymbol><o:PredefinedSymbol Ref="predefined"/></c:DestinationSymbol></o:ExtendedDependencySymbol>
+        <o:UnfamiliarSymbol Id="unknown"><a:Rect>((1000,0),(1100,100))</a:Rect></o:UnfamiliarSymbol>
+      </c:Symbols>
+    </o:PhysicalDiagram></c:PhysicalDiagrams>
+  </o:Model></c:Children></o:RootObject>
+</Model>

@@ -1,0 +1,105 @@
+<Model xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
+  <o:RootObject Id="o1">
+    <c:Children>
+      <o:Model Id="o2">
+        <a:ObjectID>00000000-0000-0000-0000-000000000002</a:ObjectID>
+        <a:Name>Fixture Model</a:Name>
+        <a:Code>FixtureModel</a:Code>
+        <a:Author>Tests</a:Author>
+        <a:Version>1.0</a:Version>
+        <c:DBMS><o:Shortcut Id="o3"><a:Name>Microsoft SQL Server</a:Name><a:Code>MSSQLSRV</a:Code></o:Shortcut></c:DBMS>
+        <c:Users><o:User Id="o80"><a:ObjectID>schema-id</a:ObjectID><a:Name>Sales Schema</a:Name><a:Code>Sales</a:Code><a:Stereotype>Schema</a:Stereotype></o:User></c:Users>
+        <c:PhysicalDiagrams>
+          <o:PhysicalDiagram Id="o20">
+            <a:ObjectID>00000000-0000-0000-0000-000000000020</a:ObjectID>
+            <a:Name>Overview</a:Name>
+            <a:Code>Overview</a:Code>
+            <c:Symbols>
+              <o:TableSymbol Id="o21">
+                <a:Rect>((100,200),(1400,900))</a:Rect>
+                <c:Object><o:Table Ref="o30"/></c:Object>
+              </o:TableSymbol>
+              <o:TableSymbol Id="o22">
+                <a:Rect>((2200,200),(3500,900))</a:Rect>
+                <c:Object><o:Table Ref="o50"/></c:Object>
+              </o:TableSymbol>
+              <o:PackageSymbol Id="o23">
+                <a:Rect>((1900,-300),(3900,1200))</a:Rect>
+                <c:Object><o:Package Ref="o41"/></c:Object>
+              </o:PackageSymbol>
+              <o:ReferenceSymbol Id="o24">
+                <a:Rect>((1400,300),(2200,650))</a:Rect>
+                <a:ListOfPoints>((1400,550),(1650,550),(1650,300),(1950,300),(1950,550),(2200,550))</a:ListOfPoints>
+                <c:SourceSymbol><o:TableSymbol Ref="o21"/></c:SourceSymbol>
+                <c:DestinationSymbol><o:TableSymbol Ref="o22"/></c:DestinationSymbol>
+                <c:Object><o:Reference Ref="o60"/></c:Object>
+              </o:ReferenceSymbol>
+            </c:Symbols>
+          </o:PhysicalDiagram>
+        </c:PhysicalDiagrams>
+        <c:DefaultDiagram><o:PhysicalDiagram Ref="o20"/></c:DefaultDiagram>
+        <c:Tables>
+          <o:Table Id="o30">
+            <a:ObjectID>00000000-0000-0000-0000-000000000030</a:ObjectID>
+            <a:Name>Order</a:Name><a:Code>Order</a:Code>
+            <a:Description>Orders containing customer and amount details.</a:Description><a:Comment>Table comment &amp; notes.</a:Comment>
+            <c:ColumnInfos>
+              <o:Column Id="o31"><a:ObjectID>00000000-0000-0000-0000-000000000031</a:ObjectID><a:Name>Order ID</a:Name><a:Code>OrderId</a:Code><a:DataType>int</a:DataType><a:Identity>1</a:Identity><a:Column.Mandatory>1</a:Column.Mandatory></o:Column>
+              <o:Column Id="o32"><a:ObjectID>00000000-0000-0000-0000-000000000032</a:ObjectID><a:Name>Customer ID</a:Name><a:Code>CustomerId</a:Code><a:DataType>int</a:DataType><a:Column.Mandatory>1</a:Column.Mandatory></o:Column>
+              <o:Column Id="o37"><a:ObjectID>00000000-0000-0000-0000-000000000037</a:ObjectID><a:Name>Tenant ID</a:Name><a:Code>TenantId</a:Code><a:DataType>int</a:DataType><a:Column.Mandatory>1</a:Column.Mandatory></o:Column>
+              <o:Column Id="o38"><a:ObjectID>00000000-0000-0000-0000-000000000038</a:ObjectID><a:Name>Row Version</a:Name><a:Code>RowVersion</a:Code><a:DataType>timestamp</a:DataType></o:Column>
+              <o:Column Id="o33"><a:ObjectID>00000000-0000-0000-0000-000000000033</a:ObjectID><a:Name>Display &amp; note &quot;quoted&quot;</a:Name><a:Code>DisplayNote</a:Code><a:Comment>R&amp;D &lt;priority&gt; &quot;high&quot;</a:Comment><a:DataType>nvarchar</a:DataType><a:Length>120</a:Length><a:DefaultValue>N'pending'</a:DefaultValue><a:Column.Mandatory>0</a:Column.Mandatory></o:Column>
+              <o:Column Id="o36"><a:ObjectID>00000000-0000-0000-0000-000000000036</a:ObjectID><a:Name>Total</a:Name><a:Code>Total</a:Code><a:DataType>decimal</a:DataType><a:Length>12</a:Length><a:Precision>2</a:Precision><a:Column.Mandatory>1</a:Column.Mandatory></o:Column>
+            </c:ColumnInfos>
+            <c:KeyInfos>
+              <o:Key Id="o34"><a:ObjectID>00000000-0000-0000-0000-000000000034</a:ObjectID><a:Name>PK_Order</a:Name><a:Code>PK_Order</a:Code><c:Key.ColumnInfos><o:Column Ref="o31"/></c:Key.ColumnInfos></o:Key>
+            </c:KeyInfos>
+            <c:PrimaryKey><o:Key Ref="o34"/></c:PrimaryKey>
+            <c:IndexeInfos>
+              <o:Index Id="o35"><a:ObjectID>00000000-0000-0000-0000-000000000035</a:ObjectID><a:Name>IX_Order_Customer</a:Name><a:Code>IX_Order_Customer</a:Code><c:Index.Columns><o:Column Ref="o32"/></c:Index.Columns></o:Index>
+            </c:IndexeInfos>
+          </o:Table>
+        </c:Tables>
+        <c:Views>
+          <o:View Id="o70"><a:ObjectID>00000000-0000-0000-0000-000000000070</a:ObjectID><a:Name>Order Summary</a:Name><a:Code>OrderSummary</a:Code><a:View.SQLQuery>SELECT OrderId, CustomerId FROM Order</a:View.SQLQuery><c:Columns><o:Column Id="o71"><a:ObjectID>view-col-1</a:ObjectID><a:Name>Order ID</a:Name><a:Code>OrderId</a:Code><a:DataType>int</a:DataType><a:Column.Mandatory>1</a:Column.Mandatory></o:Column><o:Column Id="o72"><a:ObjectID>view-col-2</a:ObjectID><a:Name>Display &amp; note</a:Name><a:Code>DisplayNote</a:Code><a:DataType>nvarchar</a:DataType><a:Length>120</a:Length><a:Comment>View &amp; comment</a:Comment></o:Column></c:Columns></o:View>
+        </c:Views>
+        <c:Packages>
+          <o:Package Id="o40">
+            <a:ObjectID>00000000-0000-0000-0000-000000000040</a:ObjectID><a:Name>Sales</a:Name><a:Code>Sales</a:Code>
+            <c:Packages>
+              <o:Package Id="o41">
+                <a:ObjectID>00000000-0000-0000-0000-000000000041</a:ObjectID><a:Name>CRM</a:Name><a:Code>CRM</a:Code>
+                <c:Tables>
+                  <o:Table Id="o50">
+                    <a:ObjectID>00000000-0000-0000-0000-000000000050</a:ObjectID><a:Name>Customer</a:Name><a:Code>Customer</a:Code>
+                    <c:Owner><o:User Ref="o80"/></c:Owner>
+                    <c:ColumnInfos>
+                      <o:Column Id="o51"><a:ObjectID>00000000-0000-0000-0000-000000000051</a:ObjectID><a:Name>Tenant ID</a:Name><a:Code>TenantId</a:Code><a:DataType>int</a:DataType><a:Column.Mandatory>1</a:Column.Mandatory></o:Column>
+                      <o:Column Id="o52"><a:ObjectID>00000000-0000-0000-0000-000000000052</a:ObjectID><a:Name>Customer ID</a:Name><a:Code>CustomerId</a:Code><a:DataType>int</a:DataType><a:Column.Mandatory>1</a:Column.Mandatory></o:Column>
+                      <o:Column Id="o53"><a:ObjectID>00000000-0000-0000-0000-000000000053</a:ObjectID><a:Name>Name</a:Name><a:Code>Name</a:Code><a:DataType>nvarchar</a:DataType><a:Length>200</a:Length></o:Column>
+                    </c:ColumnInfos>
+                    <c:KeyInfos>
+                      <o:Key Id="o54"><a:ObjectID>00000000-0000-0000-0000-000000000054</a:ObjectID><a:Name>PK_Customer</a:Name><a:Code>PK_Customer</a:Code><c:Key.ColumnInfos><o:Column Ref="o51"/><o:Column Ref="o52"/></c:Key.ColumnInfos></o:Key>
+                    </c:KeyInfos><c:PrimaryKey><o:Key Ref="o54"/></c:PrimaryKey>
+                    <c:IndexeInfos><o:Index Id="o55"><a:ObjectID>00000000-0000-0000-0000-000000000055</a:ObjectID><a:Name>IX_Customer_Name</a:Name><a:Code>IX_Customer_Name</a:Code><a:Unique>1</a:Unique><c:Index.Columns><o:Column Ref="o53"/></c:Index.Columns></o:Index></c:IndexeInfos>
+                  </o:Table>
+                </c:Tables>
+              </o:Package>
+            </c:Packages>
+          </o:Package>
+        </c:Packages>
+        <c:References>
+          <o:Reference Id="o60">
+            <a:ObjectID>00000000-0000-0000-0000-000000000060</a:ObjectID><a:Name>FK_Order_Customer</a:Name><a:Code>FK_Order_Customer</a:Code><a:Cardinality>0..*</a:Cardinality>
+            <c:ParentTable><o:Table Ref="o50"/></c:ParentTable><c:ChildTable><o:Table Ref="o30"/></c:ChildTable><c:ParentKey><o:Key Ref="o54"/></c:ParentKey>
+            <c:Joins><o:ReferenceJoin Id="o61"><a:ObjectID>00000000-0000-0000-0000-000000000061</a:ObjectID><c:Object1><o:Column Ref="o52"/></c:Object1><c:Object2><o:Column Ref="o32"/></c:Object2></o:ReferenceJoin><o:ReferenceJoin Id="o63"><a:ObjectID>00000000-0000-0000-0000-000000000063</a:ObjectID><c:Object1><o:Column Ref="o51"/></c:Object1><c:Object2><o:Column Ref="o37"/></c:Object2></o:ReferenceJoin></c:Joins>
+          </o:Reference>
+          <o:Reference Id="o62">
+            <a:ObjectID>00000000-0000-0000-0000-000000000062</a:ObjectID><a:Name>FK_Missing_Parent_Diagnostic</a:Name><a:Code>FK_Missing_Parent_Diagnostic</a:Code>
+            <c:ParentTable><o:Table Ref="o999"/></c:ParentTable><c:ChildTable><o:Table Ref="o30"/></c:ChildTable>
+          </o:Reference>
+        </c:References>
+      </o:Model>
+    </c:Children>
+  </o:RootObject>
+</Model>
