@@ -1,0 +1,33 @@
+name: Verify
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Restore
+        run: dotnet restore Bing.Pdm.sln
+      - name: Build
+        run: dotnet build Bing.Pdm.sln --no-restore --warnaserror
+      - name: Test
+        run: dotnet test Bing.Pdm.sln --no-build --no-restore
+      - name: Install browser test dependencies
+        working-directory: tests/browser-smoke
+        run: npm ci
+      - name: Install Chromium
+        working-directory: tests/browser-smoke
+        run: npx playwright install --with-deps chromium
+      - name: Test offline HTML
+        working-directory: tests/browser-smoke
+        run: npm test
