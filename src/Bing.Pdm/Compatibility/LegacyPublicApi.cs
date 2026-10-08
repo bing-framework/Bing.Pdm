@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Xml;
 using Bing.Pdm.Models.Keys;
 using Bing.Pdm.Models.Tables;
@@ -73,6 +74,30 @@ namespace Bing.Pdm.Models.Others
         /// 获取或设置目标最后修改时间。
         /// </summary>
         public DateTime TargetLastModificationDate { get; set; }
+        /// <summary>
+        /// 获取会话中的 Shortcut 原始引用。
+        /// </summary>
+        public List<string> SessionShortcutRefs { get; } = new List<string>();
+        /// <summary>
+        /// 获取会话中的复制关系原始引用。
+        /// </summary>
+        public List<string> SessionReplicationRefs { get; } = new List<string>();
+        /// <summary>
+        /// 获取嵌入快捷模型的对象描述。
+        /// </summary>
+        public List<PdmEmbeddedObjectInfo> EmbeddedObjects { get; } = new List<PdmEmbeddedObjectInfo>();
+        /// <summary>
+        /// 获取嵌入快捷模型中的复制关系。
+        /// </summary>
+        public List<PdmReplicationInfo> EmbeddedReplications { get; } = new List<PdmReplicationInfo>();
+        /// <summary>
+        /// 获取嵌入快捷模型中的顶层子复制关系。
+        /// </summary>
+        public List<PdmSubReplicationInfo> EmbeddedSubReplications { get; } = new List<PdmSubReplicationInfo>();
+        /// <summary>
+        /// 获取尚未建模的原始属性。
+        /// </summary>
+        public Dictionary<string, string> RawAttributes { get; } = new Dictionary<string, string>();
     }
 }
 

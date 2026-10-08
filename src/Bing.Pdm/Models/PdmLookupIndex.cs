@@ -59,6 +59,11 @@ namespace Bing.Pdm.Models
         private readonly Dictionary<string, PdmShortcutInfo> _shortcuts = new Dictionary<string, PdmShortcutInfo>(StringComparer.Ordinal);
 
         /// <summary>
+        /// 按节点标识查找触发器。
+        /// </summary>
+        private readonly Dictionary<string, PdmTriggerInfo> _triggers = new Dictionary<string, PdmTriggerInfo>(StringComparer.Ordinal);
+
+        /// <summary>
         /// 初始化一个 <see cref="PdmLookupIndex"/> 类型的实例。
         /// </summary>
         /// <param name="model">待索引的 PDM 模型。</param>
@@ -172,6 +177,11 @@ namespace Bing.Pdm.Models
         }
 
         /// <summary>
+        /// 按标识查找触发器。
+        /// </summary>
+        public bool TryGetTrigger(string id, out PdmTriggerInfo value) => _triggers.TryGetValue(id ?? string.Empty, out value);
+
+        /// <summary>
         /// 添加表及其列和键到索引。
         /// </summary>
         /// <param name="tables">待索引的表集合。</param>
@@ -182,6 +192,7 @@ namespace Bing.Pdm.Models
                 Add(table, _tables);
                 Add(table.Columns, _columns);
                 Add(table.Keys, _keys);
+                Add(table.Triggers, _triggers);
             }
         }
 

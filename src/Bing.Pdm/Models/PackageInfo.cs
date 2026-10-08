@@ -42,6 +42,43 @@ namespace Bing.Pdm.Models
         /// 获取包中的物理图集合。
         /// </summary>
         public List<PhysicalDiagramInfo> PhysicalDiagrams { get; } = new List<PhysicalDiagramInfo>();
+        /// <summary>
+        /// 获取包中的目标模型。
+        /// </summary>
+        public List<Bing.Pdm.Models.Others.TargetModelInfo> TargetModels { get; } = new List<Bing.Pdm.Models.Others.TargetModelInfo>();
+        /// <summary>
+        /// 获取包中的复制关系。
+        /// </summary>
+        public List<PdmReplicationInfo> Replications { get; } = new List<PdmReplicationInfo>();
+        /// <summary>
+        /// 获取包中的子复制关系。
+        /// </summary>
+        public List<PdmSubReplicationInfo> SubReplications { get; } = new List<PdmSubReplicationInfo>();
+
+        /// <summary>
+        /// 获取包及子包中的全部目标模型。
+        /// </summary>
+        [JsonIgnore]
+        public IEnumerable<Bing.Pdm.Models.Others.TargetModelInfo> AllTargetModels =>
+            TargetModels.Concat(Packages.SelectMany(x => x.AllTargetModels));
+
+        /// <summary>
+        /// 获取包及子包中的全部复制关系。
+        /// </summary>
+        [JsonIgnore]
+        public IEnumerable<PdmReplicationInfo> AllReplications =>
+            Replications.Concat(TargetModels.SelectMany(x => x.EmbeddedReplications))
+                .Concat(Packages.SelectMany(x => x.AllReplications));
+
+        /// <summary>
+        /// 获取包及子包中的全部子复制关系。
+        /// </summary>
+        [JsonIgnore]
+        public IEnumerable<PdmSubReplicationInfo> AllSubReplications =>
+            SubReplications.Concat(Replications.SelectMany(x => x.SubReplications))
+                .Concat(TargetModels.SelectMany(x => x.EmbeddedSubReplications))
+                .Concat(TargetModels.SelectMany(x => x.EmbeddedReplications).SelectMany(x => x.SubReplications))
+                .Concat(Packages.SelectMany(x => x.AllSubReplications));
 
         /// <summary>
         /// 获取兼容名称的嵌套包集合。

@@ -29,5 +29,9 @@ namespace Bing.Pdm.Models
         /// 获取或设置解析后的目标标识。
         /// </summary>
         public string ResolvedTargetId { get; set; }
+        /// <summary>
+        /// 获取或设置工作区内的规范目标地址。
+        /// </summary>
+        public PdmObjectAddress ResolvedTargetAddress { get; set; }
     }
 }

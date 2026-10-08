@@ -40,5 +40,9 @@ namespace Bing.Pdm.Models.Tables
         /// 获取表索引集合。
         /// </summary>
         public List<IndexInfo> Indexes { get; } = new List<IndexInfo>();
+        /// <summary>
+        /// 获取表触发器集合。
+        /// </summary>
+        public List<PdmTriggerInfo> Triggers { get; } = new List<PdmTriggerInfo>();
     }
 }

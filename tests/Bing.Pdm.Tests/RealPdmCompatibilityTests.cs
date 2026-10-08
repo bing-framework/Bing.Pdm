@@ -134,6 +134,18 @@ namespace Bing.Pdm.Tests
         }
 
         /// <summary>
+        /// 验证缺失索引列引用会指向原始索引列节点。
+        /// </summary>
+        [Fact]
+        public void MissingIndexColumnReferenceIsDiagnosed()
+        {
+            var xml = File.ReadAllText(Fixture).Replace(
+                "<pdmc:Column><pdmo:Column Ref=\"child-id\"/></pdmc:Column>", string.Empty);
+            var model = new PdmReader().Read(new MemoryStream(Encoding.UTF8.GetBytes(xml)));
+            Assert.Contains(model.Diagnostics, x => x.Code == "MISSING_REF" && x.SourceId == "index-column1");
+        }
+
+        /// <summary>
         /// 验证生成预检一次报告全部类型错误且不创建文件。
         /// </summary>
         [Fact]
@@ -224,7 +236,7 @@ namespace Bing.Pdm.Tests
         {
             var model = new PdmReader().ReadFromFile(SymbolsFixture);
             var diagram = Assert.Single(model.AllPhysicalDiagrams);
-            Assert.Equal(8, diagram.AllSymbols.Count());
+            Assert.Equal(9, diagram.AllSymbols.Count());
             Assert.Contains(model.Diagnostics, x => x.Code == "UNSUPPORTED_DIAGRAM_SYMBOL" && x.SourceId == "unknown");
             Assert.DoesNotContain(model.Diagnostics, x => x.Code == "UNRESOLVED_REF");
             Assert.Equal("你好 &", diagram.AllSymbols.Single(x => x.Id == "note").Text);
@@ -239,6 +251,46 @@ namespace Bing.Pdm.Tests
             Assert.Contains("Text &amp; &lt;shape&gt;", html);
             Assert.Contains("data-zoom=\"in\"", html);
             Assert.DoesNotContain("src=\"http", html);
+        }
+
+        /// <summary>
+        /// 验证未知父图元中的已知子图元仍会被读取。
+        /// </summary>
+        [Fact]
+        public void PreservesSupportedChildrenOfUnknownSymbols()
+        {
+            var xml = File.ReadAllText(SymbolsFixture).Replace(
+                "<o:UnfamiliarSymbol Id=\"unknown\"><a:Rect>((1000,0),(1100,100))</a:Rect></o:UnfamiliarSymbol>",
+                "<o:UnfamiliarSymbol Id=\"unknown\"><a:Rect>((1000,0),(1100,100))</a:Rect><c:SubSymbols><o:TextSymbol Id=\"nested-unknown\"><a:Rect>((1100,0),(1200,100))</a:Rect><a:Text>Nested</a:Text></o:TextSymbol></c:SubSymbols></o:UnfamiliarSymbol>");
+            var model = new PdmReader().Read(new MemoryStream(Encoding.UTF8.GetBytes(xml)));
+            var diagram = Assert.Single(model.AllPhysicalDiagrams);
+            Assert.Equal("UnfamiliarSymbol", diagram.Symbols.Single(x => x.Id == "unknown").Kind);
+            Assert.Equal("Nested", diagram.AllSymbols.Single(x => x.Id == "nested-unknown").Text);
+        }
+
+        /// <summary>
+        /// 验证连线端点必须属于当前物理图。
+        /// </summary>
+        [Fact]
+        public void DiagnosesCrossDiagramConnectorEndpoints()
+        {
+            var xml = File.ReadAllText(Fixture).Replace(
+                "</pdmc:PhysicalDiagrams>",
+                "<pdmo:PhysicalDiagram Id=\"diagram2\"><pdma:ObjectID>diagram-guid-2</pdma:ObjectID><pdma:Name>Second Diagram</pdma:Name><pdma:Code>SecondDiagram</pdma:Code><pdmc:Symbols><pdmo:NoteLinkSymbol Id=\"cross-link\"><pdma:ListOfPoints>((0,0),(100,100))</pdma:ListOfPoints><pdmc:SourceSymbol><pdmo:TableSymbol Ref=\"nested-shortcut-symbol1\"/></pdmc:SourceSymbol><pdmc:DestinationSymbol><pdmo:TableSymbol Ref=\"child-symbol1\"/></pdmc:DestinationSymbol></pdmo:NoteLinkSymbol></pdmc:Symbols></pdmo:PhysicalDiagram></pdmc:PhysicalDiagrams>");
+            var model = new PdmReader().Read(new MemoryStream(Encoding.UTF8.GetBytes(xml)));
+            Assert.Contains(model.Diagnostics, x => x.Code == "UNRESOLVED_REF" && x.SourceId == "cross-link");
+        }
+
+        /// <summary>
+        /// 验证 Unicode 回退字节不会重复输出或吞掉后续文本。
+        /// </summary>
+        [Fact]
+        public void DecodesMixedUnicodeAndCp936RtfText()
+        {
+            var xml = File.ReadAllText(SymbolsFixture).Replace(@"\u38?", @"\uc2\u20320\'c4\'e3X");
+            var model = new PdmReader().Read(new MemoryStream(Encoding.UTF8.GetBytes(xml)));
+            var note = Assert.Single(model.AllPhysicalDiagrams).AllSymbols.Single(x => x.Id == "note");
+            Assert.Equal("你好 你X", note.Text);
         }
 
     }

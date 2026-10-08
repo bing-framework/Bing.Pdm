@@ -16,7 +16,7 @@ namespace Bing.Pdm.Reader
     /// <summary>
     /// 解析 PowerDesigner PDM XML 文档。
     /// </summary>
-    internal sealed class PowerDesignerParser
+    internal sealed partial class PowerDesignerParser
     {
         /// <summary>
         /// XML 属性命名空间。
@@ -58,6 +58,7 @@ namespace Bing.Pdm.Reader
             ReadCommon(model, result);
             result.Author = Value(model, "Author");
             result.Version = Value(model, "Version");
+            result.DisplayPreferences = Value(model, "DisplayPreferences");
             result.RepositoryFileName = Value(model, "RepositoryFilename");
             var dbms = Elements(Child(model, CollectionNs, "DBMS")).FirstOrDefault();
             result.DbmsName = Value(dbms, "Name");
@@ -65,8 +66,11 @@ namespace Bing.Pdm.Reader
             ReadOwners(model, result);
             ReadContent(model, null, result.Packages, result.Tables, result.Shortcuts, result.Views, result.References,
                 result.PhysicalDiagrams, result.Diagnostics);
+            ReadMetadata(model, result.TargetModels, result.Replications, result.SubReplications);
+            BindSubReplicationRefs(result);
             ResolveShortcuts(result);
             Validate(result);
+            ValidateMetadata(result, model);
             return result;
         }
 
@@ -92,29 +96,48 @@ namespace Bing.Pdm.Reader
                 ReadCommon(element, package);
                 ReadContent(element, package.Id, package.Packages, package.Tables, package.Shortcuts, package.Views,
                     package.References, package.PhysicalDiagrams, diagnostics);
+                ReadMetadata(element, package.TargetModels, package.Replications, package.SubReplications);
                 packages.Add(package);
             }
             foreach (var element in Objects(node, "Tables", "Table"))
-                tables.Add(ReadTable(element, packageId));
-            foreach (var element in Objects(node, "Tables", "Shortcut"))
             {
-                var shortcut = new PdmShortcutInfo
-                {
-                    PackageId = packageId,
-                    TargetId = Value(element, "TargetID"),
-                    TargetClassId = Value(element, "TargetClassID"),
-                    TargetPackagePath = Value(element, "TargetPackagePath"),
-                    TargetKind = ShortcutKind(Value(element, "TargetClassID"))
-                };
-                ReadCommon(element, shortcut);
-                shortcuts.Add(shortcut);
+                tables.Add(ReadTable(element, packageId));
+                foreach (var item in Objects(element, "Columns", "Shortcut"))
+                    shortcuts.Add(ReadShortcut(item, packageId, "Column"));
+                foreach (var item in Objects(element, "Keys", "Shortcut"))
+                    shortcuts.Add(ReadShortcut(item, packageId, "Key"));
             }
+            foreach (var container in new[] { "Packages", "Tables", "Views", "References" })
+                foreach (var element in Objects(node, container, "Shortcut"))
+                    shortcuts.Add(ReadShortcut(element, packageId,
+                        container == "Packages" ? "Package" : container == "Tables" ? "Table" :
+                        container == "Views" ? "View" : "Reference"));
             foreach (var element in Objects(node, "Views", "View"))
                 views.Add(ReadView(element, packageId));
             foreach (var element in Objects(node, "References", "Reference"))
                 references.Add(ReadReference(element));
             foreach (var element in Objects(node, "PhysicalDiagrams", "PhysicalDiagram"))
                 diagrams.Add(ReadDiagram(element, packageId, diagnostics));
+        }
+
+        /// <summary>
+        /// 读取一个业务对象 Shortcut。
+        /// </summary>
+        private static PdmShortcutInfo ReadShortcut(XmlElement element, string packageId, string defaultKind)
+        {
+            var classId = Value(element, "TargetClassID");
+            var kind = ShortcutKind(classId);
+            if (string.IsNullOrEmpty(classId) || kind == classId) kind = defaultKind;
+            var shortcut = new PdmShortcutInfo
+            {
+                PackageId = packageId,
+                TargetId = Value(element, "TargetID"),
+                TargetClassId = classId,
+                TargetPackagePath = Value(element, "TargetPackagePath"),
+                TargetKind = kind
+            };
+            ReadCommon(element, shortcut);
+            return shortcut;
         }
 
         /// <summary>
@@ -201,6 +224,14 @@ namespace Bing.Pdm.Reader
                 }
                 table.Indexes.Add(index);
             }
+            foreach (var triggerNode in Objects(node, "Triggers", "Trigger"))
+            {
+                var trigger = new PdmTriggerInfo { TableId = table.Id,
+                    Timing = Value(triggerNode, "Time") ?? Value(triggerNode, "Timing"), Event = Value(triggerNode, "Event"), Body = Value(triggerNode, "Text") ?? Value(triggerNode, "Body") };
+                ReadCommon(triggerNode, trigger);
+                ReadUnknownAttributes(triggerNode, trigger.RawAttributes, "Time", "Timing", "Event", "Text", "Body");
+                table.Triggers.Add(trigger);
+            }
             return table;
         }
 
@@ -250,7 +281,8 @@ namespace Bing.Pdm.Reader
                 ParentTableId = ObjectRef(node, "ParentTable"),
                 ChildTableId = ObjectRef(node, "ChildTable"),
                 ParentKeyId = Ref(node, "ParentKey", "Key"),
-                Cardinality = Value(node, "Cardinality")
+                Cardinality = Value(node, "Cardinality"),
+                ForeignKeyConstraintName = Value(node, "ForeignKeyConstraintName")
             };
             ReadCommon(node, reference);
             reference.RawParentTableRef = reference.ParentTableId;
@@ -279,12 +311,21 @@ namespace Bing.Pdm.Reader
         {
             var diagram = new PhysicalDiagramInfo { PackageId = packageId };
             ReadCommon(node, diagram);
+            diagram.DisplayPreferences = Value(node, "DisplayPreferences");
             var symbols = Child(node, CollectionNs, "Symbols");
             foreach (var symbolNode in Elements(symbols))
             {
                 if (symbolNode.NamespaceURI != ObjectNs || !symbolNode.HasAttribute("Id")) continue;
                 var symbol = ReadSymbol(symbolNode, diagnostics);
-                if (symbol != null) diagram.Symbols.Add(symbol);
+                if (symbol == null) continue;
+                if (symbol.Kind == "ArchitectureAreaSymbol" && symbol.Text == null &&
+                    symbol.ObjectId != null)
+                {
+                    var area = node.OwnerDocument.GetElementsByTagName("Area", ObjectNs)
+                        .OfType<XmlElement>().FirstOrDefault(x => x.GetAttribute("Id") == symbol.ObjectId);
+                    symbol.Text = Value(area, "Name") ?? Value(area, "Code");
+                }
+                diagram.Symbols.Add(symbol);
             }
             return diagram;
         }
@@ -304,18 +345,15 @@ namespace Bing.Pdm.Reader
         /// </summary>
         /// <param name="node">图形符号 XML 节点。</param>
         /// <param name="diagnostics">接收几何及符号诊断的集合。</param>
-        /// <returns>已识别的图形符号；类型不受支持时返回 <see langword="null"/>。</returns>
+        /// <returns>解析后的图形符号；不支持的类型保留为不可渲染容器。</returns>
         private static DiagramSymbolInfo ReadSymbol(XmlElement node, List<PdmDiagnostic> diagnostics)
         {
             var kind = node.LocalName;
             var rectText = Value(node, "Rect");
             var pointText = Value(node, "ListOfPoints");
-            if (!SupportedSymbols.Contains(kind))
-            {
-                if (!string.IsNullOrWhiteSpace(rectText) || !string.IsNullOrWhiteSpace(pointText))
-                    diagnostics.Add(Diagnostic("UNSUPPORTED_DIAGRAM_SYMBOL", node.GetAttribute("Id"), "Visible diagram symbol type '" + kind + "' is not supported."));
-                return null;
-            }
+            if (!SupportedSymbols.Contains(kind) &&
+                (!string.IsNullOrWhiteSpace(rectText) || !string.IsNullOrWhiteSpace(pointText)))
+                diagnostics.Add(Diagnostic("UNSUPPORTED_DIAGRAM_SYMBOL", node.GetAttribute("Id"), "Visible diagram symbol type '" + kind + "' is not supported."));
             var rect = Rectangle(rectText, out var rectValid);
             if (!string.IsNullOrWhiteSpace(rectText) && !rectValid)
                 diagnostics.Add(Diagnostic("MALFORMED_GEOMETRY", node.GetAttribute("Id"), "Rectangle coordinates must contain four valid integers."));
@@ -331,11 +369,22 @@ namespace Bing.Pdm.Reader
                 RawObjectRef = ObjectRef(node, "Object"),
                 SourceSymbolId = ObjectRef(node, "SourceSymbol"),
                 DestinationSymbolId = ObjectRef(node, "DestinationSymbol"),
-                Text = RtfText.Decode(Value(node, "Text")),
+                Text = RtfText.Decode(Value(node, "Text")), RawText = Value(node, "Text"),
                 SymbolType = Value(node, "SymbolType"),
                 LineColor = Color(Value(node, "LineColor")),
-                FillColor = Color(Value(node, "FillColor")), Rect = rect
+                FillColor = Color(Value(node, "FillColor")), ShadowColor = Color(Value(node, "ShadowColor")),
+                FontList = Value(node, "FontList"), FontName = Value(node, "FontName"),
+                TextStyle = Value(node, "TextStyle"), DashStyle = Value(node, "DashStyle"),
+                DisplayPreferences = Value(node, "DisplayPreferences"),
+                CornerStyle = Value(node, "CornerStyle"), ArrowStyle = Value(node, "ArrowStyle"),
+                PenStyle = Value(node, "PenStyle"), LineWidth = Value(node, "LineWidth"),
+                BrushStyle = Value(node, "BrushStyle"), GradientFillMode = Value(node, "GradientFillMode"),
+                GradientEndColor = Color(Value(node, "GradientEndColor")), Rect = rect
             };
+            symbol.RichTextSegments.AddRange(RtfText.DecodeSegments(symbol.RawText));
+            var siblings = node.ParentNode?.ChildNodes.OfType<XmlElement>()
+                .Where(x => x.NamespaceURI == ObjectNs).ToList();
+            symbol.DrawOrder = siblings?.IndexOf(node) ?? 0;
             for (var i = 0; i + 1 < pointValues.Length; i += 2)
                 symbol.Points.Add(new DiagramPointInfo { X = pointValues[i], Y = pointValues[i + 1] });
             foreach (var child in Elements(Child(node, CollectionNs, "SubSymbols")))
@@ -373,6 +422,9 @@ namespace Bing.Pdm.Reader
             if (value.IndexOf("VIEW", StringComparison.OrdinalIgnoreCase) >= 0) return "View";
             if (value.IndexOf("PACKAGE", StringComparison.OrdinalIgnoreCase) >= 0) return "Package";
             if (value.IndexOf("TABLE", StringComparison.OrdinalIgnoreCase) >= 0) return "Table";
+            if (value.IndexOf("COLUMN", StringComparison.OrdinalIgnoreCase) >= 0) return "Column";
+            if (value.IndexOf("KEY", StringComparison.OrdinalIgnoreCase) >= 0) return "Key";
+            if (value.IndexOf("REFERENCE", StringComparison.OrdinalIgnoreCase) >= 0) return "Reference";
             return value;
         }
 
@@ -427,21 +479,21 @@ namespace Bing.Pdm.Reader
         /// <param name="model">待解析引用目标的 PDM 模型。</param>
         private static void ResolveShortcuts(PdmInfo model)
         {
-            var targets = model.AllTables.Where(x => !string.IsNullOrEmpty(x.ObjectId))
-                .GroupBy(x => x.ObjectId, StringComparer.Ordinal)
-                .ToDictionary(x => x.Key, x => x.ToArray(), StringComparer.Ordinal);
+            var targets = CommonObjects(model).Where(x => !string.IsNullOrEmpty(x.ObjectId))
+                .ToArray();
             var byId = model.AllShortcuts.Where(x => !string.IsNullOrEmpty(x.Id))
                 .GroupBy(x => x.Id, StringComparer.Ordinal)
                 .ToDictionary(x => x.Key, x => x.First(), StringComparer.Ordinal);
             foreach (var shortcut in model.AllShortcuts)
             {
-                TableInfo[] matches;
-                if (string.IsNullOrEmpty(shortcut.TargetId) || !targets.TryGetValue(shortcut.TargetId, out matches))
+                var matches = targets.Where(x => x.GetType().Name == shortcut.TargetKind + "Info" &&
+                    PdmIdentity.Equals(x.ObjectId, shortcut.TargetId)).ToArray();
+                if (matches.Length == 0)
                     model.Diagnostics.Add(Diagnostic("UNRESOLVED_SHORTCUT_TARGET", shortcut.Id,
                         "Shortcut target '" + shortcut.TargetId + "' cannot be found in the root model."));
                 else if (matches.Length != 1)
                     model.Diagnostics.Add(Diagnostic("AMBIGUOUS_SHORTCUT_TARGET", shortcut.Id,
-                        "Shortcut target '" + shortcut.TargetId + "' matches multiple tables."));
+                        "Shortcut target '" + shortcut.TargetId + "' matches multiple objects."));
                 else shortcut.ResolvedTargetId = matches[0].Id;
             }
             Func<string, string> normalize = id =>
@@ -472,7 +524,7 @@ namespace Bing.Pdm.Reader
                 model.Diagnostics.Add(Diagnostic("DUPLICATE_ID", duplicate.Key,
                     "PDM object ID is shared by: " + string.Join(", ", duplicate.Select(x => x.Item2).Distinct()) + "."));
 
-            model.Lookup = new PdmLookupIndex(model);
+            model.RebuildLookup();
             foreach (var table in model.AllTables)
             {
                 if (!string.IsNullOrEmpty(table.OwnerId))
@@ -495,8 +547,12 @@ namespace Bing.Pdm.Reader
                     foreach (var id in key.ColumnIds)
                         Check(model, table.Columns.Any(x => x.Id == id), id, key.Id, "key column", true);
                 foreach (var index in table.Indexes)
+                {
                     foreach (var id in index.ColumnIds)
                         Check(model, table.Columns.Any(x => x.Id == id), id, index.Id, "index column", true);
+                    foreach (var indexColumn in index.IndexColumns.Where(x => string.IsNullOrEmpty(x.ColumnId)))
+                        Check(model, false, indexColumn.ColumnId, indexColumn.Id, "index column", true);
+                }
             }
             foreach (var reference in model.AllReferences)
             {
@@ -538,9 +594,8 @@ namespace Bing.Pdm.Reader
                     if (symbol.Kind == "TableSymbol" || symbol.Kind == "PackageSymbol" || symbol.Kind == "ReferenceSymbol")
                         Check(model, SymbolTargetExists(model.Lookup, symbol), symbol.ObjectId, symbol.Id, "diagram object", true);
                     if (symbol.Kind != "ReferenceSymbol" && symbol.Kind != "NoteLinkSymbol" && symbol.Kind != "ExtendedDependencySymbol") continue;
-                    DiagramSymbolInfo endpoint;
-                    Check(model, model.Lookup.TryGetSymbol(symbol.SourceSymbolId, out endpoint), symbol.SourceSymbolId, symbol.Id, "source symbol", true);
-                    Check(model, model.Lookup.TryGetSymbol(symbol.DestinationSymbolId, out endpoint), symbol.DestinationSymbolId, symbol.Id, "destination symbol", true);
+                    Check(model, diagram.AllSymbols.Any(x => x.Id == symbol.SourceSymbolId), symbol.SourceSymbolId, symbol.Id, "source symbol", true);
+                    Check(model, diagram.AllSymbols.Any(x => x.Id == symbol.DestinationSymbolId), symbol.DestinationSymbolId, symbol.Id, "destination symbol", true);
                 }
             }
         }
@@ -565,6 +620,7 @@ namespace Bing.Pdm.Reader
                     yield return table;
                     foreach (var column in table.Columns) yield return column;
                     foreach (var key in table.Keys) yield return key;
+                foreach (var trigger in table.Triggers) yield return trigger;
                     foreach (var index in table.Indexes)
                     {
                         yield return index;
@@ -588,6 +644,7 @@ namespace Bing.Pdm.Reader
                 yield return table;
                 foreach (var column in table.Columns) yield return column;
                 foreach (var key in table.Keys) yield return key;
+                foreach (var trigger in table.Triggers) yield return trigger;
                 foreach (var index in table.Indexes)
                 {
                     yield return index;
@@ -650,9 +707,12 @@ namespace Bing.Pdm.Reader
             if (found) return;
             if (string.IsNullOrEmpty(target) && !required) return;
             var missing = string.IsNullOrEmpty(target);
-            model.Diagnostics.Add(Diagnostic(missing ? "MISSING_REF" : "UNRESOLVED_REF", source,
+            var diagnostic = Diagnostic(missing ? "MISSING_REF" : "UNRESOLVED_REF", source,
                 missing ? "Required " + role + " reference is missing."
-                    : role + " reference '" + target + "' cannot be resolved."));
+                    : role + " reference '" + target + "' cannot be resolved.");
+            diagnostic.TargetId = target;
+            diagnostic.Role = role;
+            model.Diagnostics.Add(diagnostic);
         }
 
         /// <summary>

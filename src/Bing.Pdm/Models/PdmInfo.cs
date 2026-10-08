@@ -38,6 +38,10 @@ namespace Bing.Pdm.Models
         /// </summary>
         public string Version { get; set; }
         /// <summary>
+        /// 获取或设置原始图形显示配置。
+        /// </summary>
+        public string DisplayPreferences { get; set; }
+        /// <summary>
         /// 获取或设置仓库文件名。
         /// </summary>
         public string RepositoryFileName { get; set; }
@@ -113,8 +117,15 @@ namespace Bing.Pdm.Models
         /// <summary>
         /// 获取目标模型集合。
         /// </summary>
-        [JsonIgnore]
         public List<TargetModelInfo> TargetModels { get; } = new List<TargetModelInfo>();
+        /// <summary>
+        /// 获取顶层复制关系。
+        /// </summary>
+        public List<PdmReplicationInfo> Replications { get; } = new List<PdmReplicationInfo>();
+        /// <summary>
+        /// 获取顶层子复制关系。
+        /// </summary>
+        public List<PdmSubReplicationInfo> SubReplications { get; } = new List<PdmSubReplicationInfo>();
 
         /// <summary>
         /// 按标识查找模式信息。
@@ -134,6 +145,46 @@ namespace Bing.Pdm.Models
         /// </summary>
         [JsonIgnore]
         public PdmLookupIndex Lookup { get; internal set; }
+
+        /// <summary>
+        /// 根据当前对象集合重建标识查找索引。
+        /// </summary>
+        /// <remarks>此操作不重新解析引用，也不修改已有诊断。</remarks>
+        public void RebuildLookup()
+        {
+            Lookup = new PdmLookupIndex(this);
+            MetadataLookup = new PdmMetadataLookupIndex(this);
+        }
+
+        /// <summary>
+        /// 获取复制与嵌入对象的独立索引。
+        /// </summary>
+        [JsonIgnore]
+        public PdmMetadataLookupIndex MetadataLookup { get; private set; }
+
+        /// <summary>
+        /// 获取模型中的全部目标模型。
+        /// </summary>
+        [JsonIgnore]
+        public IEnumerable<TargetModelInfo> AllTargetModels => TargetModels.Concat(Packages.SelectMany(x => x.AllTargetModels));
+
+        /// <summary>
+        /// 获取模型中的全部复制关系。
+        /// </summary>
+        [JsonIgnore]
+        public IEnumerable<PdmReplicationInfo> AllReplications =>
+            Replications.Concat(TargetModels.SelectMany(x => x.EmbeddedReplications))
+                .Concat(Packages.SelectMany(x => x.AllReplications));
+
+        /// <summary>
+        /// 获取模型中的全部子复制关系。
+        /// </summary>
+        [JsonIgnore]
+        public IEnumerable<PdmSubReplicationInfo> AllSubReplications =>
+            SubReplications.Concat(Replications.SelectMany(x => x.SubReplications))
+                .Concat(TargetModels.SelectMany(x => x.EmbeddedSubReplications))
+                .Concat(TargetModels.SelectMany(x => x.EmbeddedReplications).SelectMany(x => x.SubReplications))
+                .Concat(Packages.SelectMany(x => x.AllSubReplications));
 
         /// <summary>
         /// 获取模型中的全部表。
@@ -183,5 +234,13 @@ namespace Bing.Pdm.Models
         /// 获取或设置诊断消息。
         /// </summary>
         public string Message { get; set; }
+        /// <summary>
+        /// 获取或设置未解析的目标标识。
+        /// </summary>
+        public string TargetId { get; set; }
+        /// <summary>
+        /// 获取或设置未解析目标的角色。
+        /// </summary>
+        public string Role { get; set; }
     }
 }
