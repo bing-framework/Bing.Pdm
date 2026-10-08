@@ -717,9 +717,9 @@ namespace Bing.Pdm.Tests
         private static string FindRepositoryRoot()
         {
             var directory = new DirectoryInfo(AppContext.BaseDirectory);
-            while (directory != null && !File.Exists(Path.Combine(directory.FullName, "Bing.Pdm.sln")))
+            while (directory != null && !File.Exists(Path.Combine(directory.FullName, "Bing.Pdm.slnx")))
                 directory = directory.Parent;
-            return directory?.FullName ?? throw new DirectoryNotFoundException("Could not locate Bing.Pdm.sln from the test output directory.");
+            return directory?.FullName ?? throw new DirectoryNotFoundException("Could not locate Bing.Pdm.slnx from the test output directory.");
         }
 
         /// <summary>

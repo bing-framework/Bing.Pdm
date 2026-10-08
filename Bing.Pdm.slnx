@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="samples/Bing.Pdm.Tool/Bing.Pdm.Tool.csproj" />
+  <Project Path="src/Bing.Pdm/Bing.Pdm.csproj" />
+  <Project Path="tests/Bing.Pdm.Tests/Bing.Pdm.Tests.csproj" />
+</Solution>

@@ -254,7 +254,7 @@ namespace Bing.Pdm.Tests
         private static string FindRepositoryRoot()
         {
             var path = AppContext.BaseDirectory;
-            while (!File.Exists(Path.Combine(path, "Bing.Pdm.sln")))
+            while (!File.Exists(Path.Combine(path, "Bing.Pdm.slnx")))
                 path = Directory.GetParent(path).FullName;
             return path;
         }

@@ -29,15 +29,15 @@ Bing.Pdm 可在不安装 PowerDesigner 的情况下读取其 XML 格式的 PDM �
 ```powershell
 git clone https://github.com/bing-framework/Bing.Pdm.git
 cd Bing.Pdm
-dotnet restore Bing.Pdm.sln
-dotnet build Bing.Pdm.sln
+dotnet restore Bing.Pdm.slnx
+dotnet build Bing.Pdm.slnx
 ```
 
 用测试套件验证检出结果，它会基于 `tests/Bing.Pdm.Tests/Fixtures` 中的样例文件
 运行 xUnit 测试：
 
 ```powershell
-dotnet test Bing.Pdm.sln
+dotnet test Bing.Pdm.slnx
 ```
 
 如需启用离线 HTML 浏览器冒烟测试，需一次性安装其依赖。该测试会在真实浏览器中
@@ -79,7 +79,7 @@ $pdmDir = 'path/to/private-pdm-files'
 dotnet run --project samples/Bing.Pdm.Tool -- export model.pdm output json,md,html,svg,xlsx,docx zh
 dotnet run --project samples/Bing.Pdm.Tool -- generate model.pdm entities Demo.Entities
 dotnet run --project samples/Bing.Pdm.Tool -- generate model.pdm entities Demo.Entities --fallback-type object
-dotnet test Bing.Pdm.sln
+dotnet test Bing.Pdm.slnx
 ```
 
 导出的 JSON 可作为离线模型再次输入 CLI，无需重新读取原始 PDM：
@@ -404,7 +404,7 @@ CLI 的 export、generate、diff 和 migrate 先写独立暂存目录，再发�
 - 为每一个公开类型和成员编写 XML 文档注释，如同 `PdmExporter`、
   `PdmOfficeExporter` 和 `EntityGenerator` 那样。仓库内的摘要使用中文；修改文件
   时请与其语言保持一致。
-- 保持构建无警告。当前 `dotnet build Bing.Pdm.sln` 输出 0 个警告、0 个错误，
+- 保持构建无警告。当前 `dotnet build Bing.Pdm.slnx` 输出 0 个警告、0 个错误，
   一项修改只有在维持这两个数字为零时才算完成。
 - 公开 API 的改动应保持增量式。超出支持范围的行为应在文档中明确说明，而不是被
   静默丢弃。
@@ -416,7 +416,7 @@ CLI 的 export、generate、diff 和 migrate 先写独立暂存目录，再发�
 - 在 `tests/Bing.Pdm.Tests` 下添加 xUnit 测试。小型的合成 PDM 文件放在
   `tests/Bing.Pdm.Tests/Fixtures` 中，并通过已有的 `PreserveNewest` 项复制到
   输出目录，因此无需修改项目文件。
-- 提交拉取请求前运行 `dotnet test Bing.Pdm.sln`。
+- 提交拉取请求前运行 `dotnet test Bing.Pdm.slnx`。
 - 修改离线 HTML 数据字典时，还需运行「安装」一节所述的浏览器冒烟测试。该测试会
   导出仓库自带的样例文件，以本地文件方式打开，并检查搜索、图表链接与缩放、外部
   请求、浏览器错误以及窄视口表现。
