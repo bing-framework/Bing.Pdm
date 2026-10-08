@@ -1,0 +1,98 @@
+{
+  "width": 366,
+  "height": 167,
+  "geometryErrors": [
+    {
+      "id": "o7",
+      "nativeBounds": [
+        0,
+        19,
+        183,
+        54
+      ],
+      "renderedBounds": [
+        0,
+        18.84,
+        181.86,
+        53.78
+      ],
+      "meanAbsoluteError": 0.3817699357261306
+    },
+    {
+      "id": "o6",
+      "nativeBounds": [
+        28,
+        112,
+        127,
+        55
+      ],
+      "renderedBounds": [
+        27.85,
+        113.22,
+        126.15,
+        53.78
+      ],
+      "meanAbsoluteError": 0.8610806034485776
+    },
+    {
+      "id": "o11",
+      "nativeBounds": [
+        203,
+        0,
+        164,
+        133
+      ],
+      "renderedBounds": [
+        203.1,
+        0,
+        162.9,
+        133.13
+      ],
+      "meanAbsoluteError": 0.33261189066384134
+    },
+    {
+      "id": "o12",
+      "nativeBounds": [
+        211,
+        32,
+        67,
+        27
+      ],
+      "renderedBounds": [
+        211.11,
+        32.27,
+        66.76,
+        26.89
+      ],
+      "meanAbsoluteError": 0.18265289358505665
+    }
+  ],
+  "lineErrors": [
+    {
+      "id": "o5",
+      "nativePoints": [
+        [
+          91,
+          112
+        ],
+        [
+          91,
+          73
+        ]
+      ],
+      "renderedPoints": [
+        [
+          90.94,
+          113.22
+        ],
+        [
+          90.94,
+          72.61
+        ]
+      ],
+      "meanAbsoluteError": 0.4313181174985772
+    }
+  ],
+  "meanAbsoluteError": 12.615604855862047,
+  "changedFraction": 0.12748273943915447
+}

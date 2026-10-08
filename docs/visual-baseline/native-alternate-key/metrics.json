@@ -1,0 +1,66 @@
+{
+  "width": 183,
+  "height": 165,
+  "geometryErrors": [
+    {
+      "id": "o7",
+      "nativeBounds": [
+        0,
+        0,
+        183,
+        77
+      ],
+      "renderedBounds": [
+        0,
+        0,
+        183,
+        77.06
+      ],
+      "meanAbsoluteError": 0.015257832898171841
+    },
+    {
+      "id": "o6",
+      "nativeBounds": [
+        28,
+        100,
+        127,
+        64
+      ],
+      "renderedBounds": [
+        28.03,
+        101.07,
+        126.94,
+        63.93
+      ],
+      "meanAbsoluteError": 0.3034112573469354
+    }
+  ],
+  "lineErrors": [
+    {
+      "id": "o5",
+      "nativePoints": [
+        [
+          91,
+          100
+        ],
+        [
+          91,
+          77
+        ]
+      ],
+      "renderedPoints": [
+        [
+          91.51,
+          101.07
+        ],
+        [
+          91.51,
+          77.06
+        ]
+      ],
+      "meanAbsoluteError": 0.5382740342588619
+    }
+  ],
+  "meanAbsoluteError": 24.058751448915384,
+  "changedFraction": 0.2579897333995695
+}

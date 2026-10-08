@@ -2,7 +2,7 @@
   "name": "bing-pdm-browser-smoke",
   "private": true,
   "scripts": {
-    "test": "node --test"
+    "test": "dotnet build ../../samples/Bing.Pdm.Tool/Bing.Pdm.Tool.csproj --no-restore --nologo --verbosity minimal && node --test"
   },
   "devDependencies": {
     "playwright": "1.62.1"

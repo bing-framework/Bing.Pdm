@@ -1,0 +1,19 @@
+{
+  "software": "PowerDesigner 16.7.4.6866",
+  "model": "native-triggers.pdm",
+  "diagramCode": "PhysicalDiagram_1",
+  "os": "Windows",
+  "displayScale": "100%",
+  "dpi": 96,
+  "pngSize": [
+    183,
+    158
+  ],
+  "fonts": [
+    "Arial",
+    "Times New Roman",
+    "\u65b0\u5b8b\u4f53"
+  ],
+  "export": "PhysicalDiagram.ExportImage PNG/SVG; default native tight PNG crop",
+  "manualAcceptance": "PENDING_HUMAN_REVIEW"
+}

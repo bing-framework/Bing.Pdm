@@ -12,8 +12,9 @@ test('extended PDM symbols remain visible in offline HTML', async () => {
   const output = fs.mkdtempSync(path.join(os.tmpdir(), 'bing-pdm-symbol-smoke-'));
   const fixture = path.join(root, 'tests/Bing.Pdm.Tests/Fixtures/symbols-compat.pdm');
   const tool = path.join(root, 'samples/Bing.Pdm.Tool/bin/Debug/net8.0/Bing.Pdm.Tool.dll');
+  assert.ok(fs.existsSync(tool), `CLI assembly was not built at ${tool}. Run npm test from tests/browser-smoke.`);
   const result = spawnSync('dotnet', [tool, 'export', fixture, output, 'html'], { encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, 0, `PDM symbol HTML export failed with exit code ${result.status}:\n${result.stdout}\n${result.stderr}`);
   const html = path.join(output, 'symbols-compat.html');
   const options = { headless: true };
   if (process.env.PDM_BROWSER_EXECUTABLE) options.executablePath = process.env.PDM_BROWSER_EXECUTABLE;
@@ -27,9 +28,17 @@ test('extended PDM symbols remain visible in offline HTML', async () => {
     await page.goto(pathToFileURL(html).href);
     for (const id of ['area', 'ellipse', 'note', 'text', 'predefined', 'polyline', 'note-link', 'dependency'])
       assert.equal(await page.locator(`[data-symbol-id="${id}"]`).count(), 1, id);
+    for (const id of ['area', 'ellipse', 'note', 'text', 'predefined']) {
+      const box = await page.locator(`[data-symbol-id="${id}"]`).boundingBox();
+      assert.ok(box && box.width > 0 && box.height > 0, `${id} has no visible geometry`);
+    }
     assert.match(await page.locator('[data-symbol-id="note"]').textContent(), /你好/);
     assert.equal(await page.locator('[data-symbol-id="ellipse"] ellipse').count(), 1);
     assert.equal(await page.locator('[data-symbol-id="note-link"] polyline').count(), 1);
+    for (const id of ['polyline', 'note-link', 'dependency']) {
+      const points = await page.locator(`[data-symbol-id="${id}"] polyline`).getAttribute('points');
+      assert.ok(points && points.trim().split(/\s+/).length >= 2, `${id} has no connection path`);
+    }
     const svg = page.locator('.diagram-panel svg');
     const before = await svg.getAttribute('viewBox');
     await page.locator('[data-zoom="in"]').click();

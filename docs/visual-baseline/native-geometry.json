@@ -1,0 +1,12 @@
+{
+  "diagram": "PhysicalDiagram_1",
+  "imageWidth": 183,
+  "imageHeight": 148,
+  "symbols": [
+    { "id": "o7", "bounds": [0, 0, 183, 54] },
+    { "id": "o6", "bounds": [28, 94, 127, 54] }
+  ],
+  "lines": [
+    { "id": "o5", "points": [[91, 94], [91, 54]] }
+  ]
+}

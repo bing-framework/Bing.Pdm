@@ -1,0 +1,38 @@
+{
+  "symbols": [
+    {
+      "id": "o7",
+      "bounds": [
+        0.0,
+        0.0,
+        183.0,
+        64.0
+      ]
+    },
+    {
+      "id": "o6",
+      "bounds": [
+        28.0,
+        94.0,
+        127.0,
+        64.0
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "id": "o5",
+      "points": [
+        [
+          91.0,
+          94.0
+        ],
+        [
+          91.0,
+          64.0
+        ]
+      ]
+    }
+  ],
+  "source": "PowerDesigner native-original.svg; bounds shifted to PNG tight crop; stroke-inclusive width"
+}

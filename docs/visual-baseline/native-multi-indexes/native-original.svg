@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="102mm" xmlns="http://www.w3.org/2000/svg" height="51mm" version="1.1" viewBox="0 0 388 196" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <a target="_parent" xlink:href="#F3518109-68D4-49AB-8D16-C8969A3CB8AD">
+      <polyline fill="none" points="194,116 194,93" stroke="#800040" stroke-width="1"/>
+      <polygon fill="#800040" points="194,93 197,106 191,106" stroke="#800040" stroke-width="1" stroke-linejoin="miter"/>
+      <text x="194" y="107" fill="#000000" font-size="10" font-family="'Arial Unicode MS','新宋体'" text-anchor="middle">FK_FK_Order_Customer</text>
+   </a>
+   <a target="_parent" xlink:href="#9960C256-E2AE-43A7-951B-DBC673D11448">
+      <rect x="103" y="16" fill="#ffffff" width="0" height="0" stroke="none" stroke-width="0"/>
+      <defs>
+         <linearGradient id="Gradient1" x1="0%" x2="100%" y1="0%" y2="100%" gradientUnits="objectBoundingBox">
+            <stop offset="5%" stop-color="#ffffff"/>
+            <stop offset="95%" stop-color="#d28902"/>
+         </linearGradient>
+      </defs>
+      <rect x="103" y="16" fill="url(#Gradient1)" width="182" height="77" stroke="#804000" stroke-width="1"/>
+      <text x="194" y="27" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="middle">Orders</text>
+      <line x1="103" x2="285" y1="33" y2="33" stroke="#804000" stroke-width="1"/>
+      <text x="108" y="43" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start" text-decoration="underline">Order ID</text>
+      <text x="108" y="56" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start">Customer Name</text>
+      <text x="191" y="43" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start" text-decoration="underline">int</text>
+      <text x="191" y="56" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start">varchar(120)</text>
+      <text x="257" y="43" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start" text-decoration="underline">&lt;pk&gt;</text>
+      <line x1="103" x2="285" y1="63" y2="63" stroke="#804000" stroke-width="1"/>
+      <text x="127" y="73" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start">IX Orders Name</text>
+      <text x="127" y="86" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start">IX Orders ID</text>
+      <polyline fill="none" points="111,77 119,77 119,66 111,66 111,77" stroke="#000000" stroke-width="1"/>
+      <polyline fill="none" points="113,75 116,75 116,73 113,73 113,75" stroke="#000000" stroke-width="1"/>
+      <polyline fill="none" points="113,70 116,70 116,68 113,68 113,70" stroke="#000000" stroke-width="1"/>
+      <polyline fill="none" points="111,90 119,90 119,79 111,79 111,90" stroke="#000000" stroke-width="1"/>
+      <polyline fill="none" points="113,88 116,88 116,85 113,85 113,88" stroke="#000000" stroke-width="1"/>
+      <polyline fill="none" points="113,83 116,83 116,81 113,81 113,83" stroke="#000000" stroke-width="1"/>
+   </a>
+   <a target="_parent" xlink:href="#7574CC24-9D50-49B4-8429-12DBF686E5D1">
+      <rect x="131" y="116" fill="#ffffff" width="0" height="0" stroke="none" stroke-width="0"/>
+      <defs>
+         <linearGradient id="Gradient2" x1="0%" x2="100%" y1="0%" y2="100%" gradientUnits="objectBoundingBox">
+            <stop offset="5%" stop-color="#ffffff"/>
+            <stop offset="95%" stop-color="#d28902"/>
+         </linearGradient>
+      </defs>
+      <rect x="131" y="116" fill="url(#Gradient2)" width="126" height="64" stroke="#804000" stroke-width="1"/>
+      <text x="194" y="127" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="middle">Customers</text>
+      <line x1="131" x2="257" y1="133" y2="133" stroke="#804000" stroke-width="1"/>
+      <text x="136" y="143" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start" text-decoration="underline">Order ID</text>
+      <text x="136" y="156" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start">Customer ID</text>
+      <text x="201" y="143" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start" text-decoration="underline">int</text>
+      <text x="201" y="156" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start">int</text>
+      <text x="221" y="143" fill="#000000" font-size="10" font-family="'Arial Unicode MS','Arial'" text-anchor="start" text-decoration="underline">&lt;pk,fk&gt;</text>
+      <line x1="131" x2="257" y1="163" y2="163" stroke="#804000" stroke-width="1"/>
+   </a>
+</svg>

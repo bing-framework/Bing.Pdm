@@ -1,0 +1,41 @@
+{
+  "width": 183,
+  "height": 148,
+  "geometryErrors": [
+    {
+      "id": "o7",
+      "nativeBounds": [
+        0,
+        0,
+        183,
+        54
+      ],
+      "renderedBounds": [
+        0,
+        0,
+        183,
+        53.72
+      ],
+      "meanAbsoluteError": 0.07079324741332371
+    },
+    {
+      "id": "o6",
+      "nativeBounds": [
+        28,
+        94,
+        127,
+        54
+      ],
+      "renderedBounds": [
+        28.03,
+        94.28,
+        126.94,
+        53.72
+      ],
+      "meanAbsoluteError": 0.16240147280021588
+    }
+  ],
+  "lineErrors": [],
+  "meanAbsoluteError": 18.13982425047999,
+  "changedFraction": 0.19236449564318417
+}

@@ -8,17 +8,18 @@ const { test } = require('node:test');
 const { chromium } = require('playwright');
 
 const repositoryRoot = path.resolve(__dirname, '../..');
+const cliAssembly = path.join(repositoryRoot, 'samples', 'Bing.Pdm.Tool', 'bin', 'Debug', 'net8.0', 'Bing.Pdm.Tool.dll');
 
 function exportFixture() {
   const outputDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'bing-pdm-browser-smoke-'));
   const fixture = path.join(repositoryRoot, 'tests', 'Bing.Pdm.Tests', 'Fixtures', 'complete.pdm');
-  const project = path.join(repositoryRoot, 'samples', 'Bing.Pdm.Tool', 'Bing.Pdm.Tool.csproj');
-  const result = spawnSync('dotnet', [
-    'run', '--project', project, '--no-restore', '--',
-    'export', fixture, outputDirectory, 'html', 'en'
-  ], { cwd: repositoryRoot, encoding: 'utf8' });
+  assert.ok(fs.existsSync(cliAssembly), `CLI assembly was not built at ${cliAssembly}. Run npm test from tests/browser-smoke.`);
+  const result = spawnSync('dotnet', [cliAssembly, 'export', fixture, outputDirectory, 'html', 'en'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8'
+  });
 
-  assert.equal(result.status, 0, `PDM HTML export failed:\n${result.stdout}\n${result.stderr}`);
+  assert.equal(result.status, 0, `PDM HTML export failed with exit code ${result.status}:\n${result.stdout}\n${result.stderr}`);
 
   const htmlPath = path.join(outputDirectory, 'complete.html');
   assert.ok(fs.existsSync(htmlPath), `Expected exporter output at ${htmlPath}`);
@@ -64,6 +65,15 @@ test('offline HTML dictionary supports search, diagram links, and zoom', async (
     assert.equal(await page.locator('[data-searchable]:not([hidden])').count(), 1);
     assert.match(await page.locator('[data-searchable]:not([hidden])').innerText(), /Order Summary/);
     assert.equal(await page.locator('#tables article:not([hidden])').count(), 0);
+
+    await search.fill('No matching entry');
+    const filteredTableLink = page.locator('.diagram-panel svg a[href^="#table-"]').first();
+    const filteredTableTarget = await filteredTableLink.getAttribute('href');
+    assert.ok(filteredTableTarget, 'Expected a diagram symbol link while search hides dictionary entries');
+    await filteredTableLink.click();
+    assert.equal(await page.evaluate(() => location.hash), filteredTableTarget);
+    assert.ok(await page.locator(filteredTableTarget).isVisible(),
+      'Diagram link target should be visible while search hides non-matching entries');
     await search.fill('');
 
     const svg = page.locator('.diagram-panel svg').first();
