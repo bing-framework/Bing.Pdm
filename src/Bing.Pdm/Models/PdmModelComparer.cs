@@ -137,8 +137,11 @@ namespace Bing.Pdm.Models
         {
             if (before == null) throw new ArgumentNullException(nameof(before));
             if (after == null) throw new ArgumentNullException(nameof(after));
-            var result = new PdmDiffResult { BeforeDbms = before.DbmsCode ?? before.DbmsName,
-                AfterDbms = after.DbmsCode ?? after.DbmsName };
+            var result = new PdmDiffResult
+            {
+                BeforeDbms = before.DbmsCode ?? before.DbmsName,
+                AfterDbms = after.DbmsCode ?? after.DbmsName
+            };
             var validator = new PdmModelValidator();
             result.ValidationIssues.AddRange(validator.Validate(before, options?.BeforeWorkspace, options?.BeforeModelKey)
                 .Issues.Where(x => x.Scope == "Structure").Select(x => new PdmDiffValidationIssue { Side = "Before", Issue = x }));
@@ -387,10 +390,18 @@ namespace Bing.Pdm.Models
         /// </summary>
         private static void Change(PdmDiffResult result, string kind, string type, PdmCommonInfo a,
             PdmCommonInfo b, string oldPath, string newPath, string property, string oldValue, string newValue) =>
-            result.Changes.Add(new PdmDiffChange { Kind = kind, ChangeType = type,
-                BeforeId = a?.ObjectId ?? a?.Id, AfterId = b?.ObjectId ?? b?.Id,
-                BeforePath = oldPath, AfterPath = newPath, Property = property,
-                BeforeValue = oldValue, AfterValue = newValue });
+            result.Changes.Add(new PdmDiffChange
+            {
+                Kind = kind,
+                ChangeType = type,
+                BeforeId = a?.ObjectId ?? a?.Id,
+                AfterId = b?.ObjectId ?? b?.Id,
+                BeforePath = oldPath,
+                AfterPath = newPath,
+                Property = property,
+                BeforeValue = oldValue,
+                AfterValue = newValue
+            });
 
         /// <summary>
         /// 统一文本换行。

@@ -72,12 +72,12 @@ namespace Bing.Pdm.Tests
             using (var archive = ZipFile.OpenRead(path))
             {
                 foreach (var entry in archive.Entries.Where(x => IsSemanticEntry(x.FullName, format)))
-                using (var stream = entry.Open())
-                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
-                {
-                    var document = XDocument.Parse(reader.ReadToEnd(), LoadOptions.PreserveWhitespace);
-                    entries[entry.FullName] = document.ToString(SaveOptions.DisableFormatting);
-                }
+                    using (var stream = entry.Open())
+                    using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                    {
+                        var document = XDocument.Parse(reader.ReadToEnd(), LoadOptions.PreserveWhitespace);
+                        entries[entry.FullName] = document.ToString(SaveOptions.DisableFormatting);
+                    }
             }
             return entries;
         }

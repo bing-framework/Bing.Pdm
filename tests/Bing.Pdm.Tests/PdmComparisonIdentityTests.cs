@@ -124,13 +124,13 @@ namespace Bing.Pdm.Tests
                 {
                     var parent = model.AllTables.FirstOrDefault(x => x.Id == reference.ParentTableId);
                     if (parent != null) reference.ParentTableAddress = new PdmObjectAddress
-                        { ModelKey = "current", PdmId = parent.Id, ObjectId = parent.ObjectId };
+                    { ModelKey = "current", PdmId = parent.Id, ObjectId = parent.ObjectId };
                     foreach (var join in reference.Joins)
                     {
                         var column = model.AllTables.SelectMany(x => x.Columns)
                             .FirstOrDefault(x => x.Id == join.ParentColumnId);
                         if (column != null) join.ParentColumnAddress = new PdmObjectAddress
-                            { ModelKey = "current", PdmId = column.Id, ObjectId = column.ObjectId };
+                        { ModelKey = "current", PdmId = column.Id, ObjectId = column.ObjectId };
                     }
                 }
             Assert.Empty(new PdmModelComparer().Compare(before, after).Changes);
@@ -151,9 +151,15 @@ namespace Bing.Pdm.Tests
             foreach (var code in new[] { "A", "B" })
             {
                 var package = new PackageInfo { Id = code, Code = code };
-                package.References.Add(new ReferenceInfo { Id = "ref-" + code, Code = "SameName",
+                package.References.Add(new ReferenceInfo
+                {
+                    Id = "ref-" + code,
+                    Code = "SameName",
                     ObjectId = (newGuids ? "new-" : "old-") + code,
-                    ParentTableId = "t", ChildTableId = "t", ParentKeyId = "k" });
+                    ParentTableId = "t",
+                    ChildTableId = "t",
+                    ParentKeyId = "k"
+                });
                 outer.Packages.Add(package);
             }
             return model;

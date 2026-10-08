@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Bing.Pdm.Models.PhysicalDiagrams;
 using Bing.Pdm.Models.Others;
+using Bing.Pdm.Models.PhysicalDiagrams;
 using Bing.Pdm.Models.References;
 using Bing.Pdm.Models.Tables;
 using Newtonsoft.Json.Serialization;
@@ -213,8 +213,16 @@ namespace Bing.Pdm.Models
                 if (value is PhysicalDiagramInfo physical) { diagram = physical; scope = "Diagram"; }
                 if (value is PdmReplicationInfo || value is PdmSubReplicationInfo || value is PdmEmbeddedObjectInfo ||
                     value.GetType().Name == "TargetModelInfo") scope = "Metadata";
-                var entry = new Entry { Value = value, Parent = parent, Path = path, Kind = Kind(value),
-                    Scope = scope, Diagram = diagram, IdentityScope = identityScope };
+                var entry = new Entry
+                {
+                    Value = value,
+                    Parent = parent,
+                    Path = path,
+                    Kind = Kind(value),
+                    Scope = scope,
+                    Diagram = diagram,
+                    IdentityScope = identityScope
+                };
                 if (_active.Contains(value)) { Add(Issues, entry, "COLLECTION_CYCLE", entry.Id, "collection"); return; }
                 if (value is PdmCommonInfo || value is DiagramSymbolInfo)
                 {
@@ -230,8 +238,15 @@ namespace Bing.Pdm.Models
                     if (child == null)
                     {
                         if (Contracts.ResolveContract(property.PropertyType) is JsonArrayContract)
-                            Issues.Add(new PdmValidationIssue { Code = "NULL_MODEL_COLLECTION", Kind = entry.Kind,
-                                SourceId = entry.Id, Path = childPath, Scope = scope, Role = property.PropertyName });
+                            Issues.Add(new PdmValidationIssue
+                            {
+                                Code = "NULL_MODEL_COLLECTION",
+                                Kind = entry.Kind,
+                                SourceId = entry.Id,
+                                Path = childPath,
+                                Scope = scope,
+                                Role = property.PropertyName
+                            });
                         continue;
                     }
                     if (child is string || child is IDictionary) continue;
@@ -243,8 +258,15 @@ namespace Bing.Pdm.Models
                             var itemPath = childPath + "[" + index++ + "]";
                             if (item == null)
                             {
-                                Issues.Add(new PdmValidationIssue { Code = "NULL_MODEL_ITEM", Kind = entry.Kind,
-                                    SourceId = entry.Id, Path = itemPath, Scope = scope, Role = property.PropertyName });
+                                Issues.Add(new PdmValidationIssue
+                                {
+                                    Code = "NULL_MODEL_ITEM",
+                                    Kind = entry.Kind,
+                                    SourceId = entry.Id,
+                                    Path = itemPath,
+                                    Scope = scope,
+                                    Role = property.PropertyName
+                                });
                                 continue;
                             }
                             var embedded = property.PropertyName.StartsWith("Embedded", StringComparison.Ordinal);
@@ -505,7 +527,15 @@ namespace Bing.Pdm.Models
         /// 记录对象问题。
         /// </summary>
         private static void Add(List<PdmValidationIssue> issues, Entry source, string code, string target, string role) =>
-            issues.Add(new PdmValidationIssue { Code = code, Kind = source.Kind, SourceId = source.Id,
-                Path = source.Path, TargetId = target, Role = role, Scope = source.Scope });
+            issues.Add(new PdmValidationIssue
+            {
+                Code = code,
+                Kind = source.Kind,
+                SourceId = source.Id,
+                Path = source.Path,
+                TargetId = target,
+                Role = role,
+                Scope = source.Scope
+            });
     }
 }

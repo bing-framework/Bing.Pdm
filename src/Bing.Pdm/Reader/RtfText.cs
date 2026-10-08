@@ -151,10 +151,17 @@ namespace Bing.Pdm.Reader
             Action flushRun = () =>
             {
                 if (run.Length == 0) return;
-                result.Add(new PdmRichTextSegmentInfo { Text = run.ToString(), Bold = state.Bold,
-                    Italic = state.Italic, FontSize = state.FontSize, Underline = state.Underline,
-                    FontFamily = state.FontFamily, ForegroundColor = state.ForegroundColor,
-                    ParagraphAlignment = state.ParagraphAlignment });
+                result.Add(new PdmRichTextSegmentInfo
+                {
+                    Text = run.ToString(),
+                    Bold = state.Bold,
+                    Italic = state.Italic,
+                    FontSize = state.FontSize,
+                    Underline = state.Underline,
+                    FontFamily = state.FontFamily,
+                    ForegroundColor = state.ForegroundColor,
+                    ParagraphAlignment = state.ParagraphAlignment
+                });
                 run.Clear();
             };
             Action flushBytes = () =>
@@ -381,9 +388,19 @@ namespace Bing.Pdm.Reader
             /// 复制解析状态以初始化嵌套 RTF 组。
             /// </summary>
             /// <returns>复制后的解析状态。</returns>
-            public State Copy() => new State { Hidden = Hidden, UnicodeSkip = UnicodeSkip, Skip = Skip,
-                Bold = Bold, Italic = Italic, FontSize = FontSize, Underline = Underline,
-                FontFamily = FontFamily, ForegroundColor = ForegroundColor, ParagraphAlignment = ParagraphAlignment };
+            public State Copy() => new State
+            {
+                Hidden = Hidden,
+                UnicodeSkip = UnicodeSkip,
+                Skip = Skip,
+                Bold = Bold,
+                Italic = Italic,
+                FontSize = FontSize,
+                Underline = Underline,
+                FontFamily = FontFamily,
+                ForegroundColor = ForegroundColor,
+                ParagraphAlignment = ParagraphAlignment
+            };
         }
     }
 }

@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using Bing.Pdm;
 using Bing.Pdm.Models;
+using Bing.Pdm.Models.Others;
 using Bing.Pdm.Models.References;
 using Bing.Pdm.Models.Tables;
-using Bing.Pdm.Models.Others;
 using Xunit;
 
 namespace Bing.Pdm.Tests
@@ -99,7 +99,7 @@ namespace Bing.Pdm.Tests
 
             var external = ValidModel();
             external.References.Single().ParentTableAddress = new PdmObjectAddress
-                { ModelKey = "warehouse", PdmId = "orders" };
+            { ModelKey = "warehouse", PdmId = "orders" };
             var externalIssues = new PdmModelValidator().Validate(external).Issues;
             Assert.Contains(externalIssues, x => x.Code == "EXTERNAL_TARGET_UNVERIFIED");
         }
@@ -132,7 +132,7 @@ namespace Bing.Pdm.Tests
             var target = ValidModel();
             target.ObjectId = "target-model-guid";
             source.References.Single().ParentTableAddress = new PdmObjectAddress
-                { ModelKey = "target", PdmId = "orders" };
+            { ModelKey = "target", PdmId = "orders" };
             var workspace = new PdmWorkspace();
             workspace.Add("source", source);
             workspace.Add("target", target);
@@ -217,18 +217,33 @@ namespace Bing.Pdm.Tests
             var model = new PdmInfo { Id = "model", ObjectId = "model-guid" };
             var table = new TableInfo { Id = "orders", ObjectId = "table-guid", Name = "Orders" };
             table.Columns.Add(new ColumnInfo { Id = "order-id", ObjectId = "column-guid", Name = "Id" });
-            table.Keys.Add(new Bing.Pdm.Models.Keys.KeyInfo { Id = "pk-orders", ObjectId = "key-guid",
-                ColumnIds = { "order-id" } });
+            table.Keys.Add(new Bing.Pdm.Models.Keys.KeyInfo
+            {
+                Id = "pk-orders",
+                ObjectId = "key-guid",
+                ColumnIds = { "order-id" }
+            });
             table.PrimaryKeyId = "pk-orders";
-            table.Indexes.Add(new IndexInfo { Id = "ix-orders", ObjectId = "index-guid",
-                ColumnIds = { "order-id" } });
+            table.Indexes.Add(new IndexInfo
+            {
+                Id = "ix-orders",
+                ObjectId = "index-guid",
+                ColumnIds = { "order-id" }
+            });
             model.Tables.Add(table);
-            model.References.Add(new ReferenceInfo { Id = "ref-orders", ObjectId = "ref-guid",
-                ParentTableId = "orders", ChildTableId = "orders", ParentKeyId = "pk-orders", Joins =
-                { new ReferenceJoinInfo { Id = "join-orders", ParentColumnId = "order-id", ChildColumnId = "order-id" } } });
+            model.References.Add(new ReferenceInfo
+            {
+                Id = "ref-orders",
+                ObjectId = "ref-guid",
+                ParentTableId = "orders",
+                ChildTableId = "orders",
+                ParentKeyId = "pk-orders",
+                Joins =
+                { new ReferenceJoinInfo { Id = "join-orders", ParentColumnId = "order-id", ChildColumnId = "order-id" } }
+            });
             var diagram = new Bing.Pdm.Models.PhysicalDiagrams.PhysicalDiagramInfo { Id = "diagram" };
             diagram.Symbols.Add(new Bing.Pdm.Models.PhysicalDiagrams.DiagramSymbolInfo
-                { Id = "symbol", Kind = "TableSymbol", ObjectId = "orders" });
+            { Id = "symbol", Kind = "TableSymbol", ObjectId = "orders" });
             model.PhysicalDiagrams.Add(diagram);
             return model;
         }

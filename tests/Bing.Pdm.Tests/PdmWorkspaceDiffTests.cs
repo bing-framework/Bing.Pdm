@@ -1,14 +1,14 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using Bing.Pdm;
 using Bing.Pdm.Models;
-using Bing.Pdm.Models.Tables;
 using Bing.Pdm.Models.Others;
+using Bing.Pdm.Models.Tables;
 using Bing.Pdm.Reader;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -121,8 +121,13 @@ namespace Bing.Pdm.Tests
             var sales = workspace.Models["sales"];
             var first = sales.AllShortcuts.Single();
             sales.TargetModels.Single().SessionShortcutRefs.Clear();
-            var second = new PdmShortcutInfo { Id = "sc2", ObjectId = "second-shortcut-guid",
-                TargetId = first.ObjectId, TargetKind = "Table" };
+            var second = new PdmShortcutInfo
+            {
+                Id = "sc2",
+                ObjectId = "second-shortcut-guid",
+                TargetId = first.ObjectId,
+                TargetKind = "Table"
+            };
             first.TargetId = second.ObjectId;
             sales.Shortcuts.Add(second);
             sales.RebuildLookup();
@@ -147,7 +152,9 @@ namespace Bing.Pdm.Tests
             session.SessionReplicationRefs.Add("replication");
             session.EmbeddedObjects.Add(new PdmEmbeddedObjectInfo
             {
-                Id = "embedded", ObjectId = "table-guid", Kind = "Table"
+                Id = "embedded",
+                ObjectId = "table-guid",
+                Kind = "Table"
             });
             source.TargetModels.Add(session);
             var replication = new PdmReplicationInfo { Id = "replication", OriginalId = "table-guid" };
@@ -180,8 +187,12 @@ namespace Bing.Pdm.Tests
             var sales = workspace.Models["sales"];
             var reference = sales.AllReferences.Single();
             var localColumn = sales.AllTables.Single().Columns.First();
-            var shortcut = new PdmShortcutInfo { Id = "wrong-column-shortcut",
-                TargetId = localColumn.ObjectId, TargetKind = "Column" };
+            var shortcut = new PdmShortcutInfo
+            {
+                Id = "wrong-column-shortcut",
+                TargetId = localColumn.ObjectId,
+                TargetKind = "Column"
+            };
             sales.Shortcuts.Add(shortcut);
             reference.Joins.Single().ParentColumnId = shortcut.Id;
             sales.RebuildLookup();
@@ -192,8 +203,11 @@ namespace Bing.Pdm.Tests
                 x.Code == "INVALID_WORKSPACE_REFERENCE" && x.SourceId == reference.Joins.Single().Id);
 
             var original = sales.AllShortcuts.First(x => x.Id != shortcut.Id);
-            var duplicateSession = new TargetModelInfo { Id = "second-session",
-                TargetModelId = workspace.Models["warehouse"].ObjectId };
+            var duplicateSession = new TargetModelInfo
+            {
+                Id = "second-session",
+                TargetModelId = workspace.Models["warehouse"].ObjectId
+            };
             duplicateSession.SessionShortcutRefs.Add(original.Id);
             sales.TargetModels.Add(duplicateSession);
             sales.RebuildLookup();
@@ -213,8 +227,12 @@ namespace Bing.Pdm.Tests
                 Path.Combine(AppContext.BaseDirectory, "Fixtures", "workspace.json"));
             var sales = workspace.Models["sales"];
             var shortcut = sales.AllShortcuts.Single();
-            var replication = new PdmReplicationInfo { Id = "copy",
-                ReplicaObjectRef = shortcut.Id, ReplicaObjectKind = "Shortcut" };
+            var replication = new PdmReplicationInfo
+            {
+                Id = "copy",
+                ReplicaObjectRef = shortcut.Id,
+                ReplicaObjectKind = "Shortcut"
+            };
             sales.Replications.Add(replication);
             sales.RebuildLookup();
             new PdmWorkspaceResolver().Resolve(workspace);
@@ -314,8 +332,13 @@ namespace Bing.Pdm.Tests
             customer.Keys.First(x => x.Id == customer.PrimaryKeyId).ColumnIds.Reverse();
             Assert.Contains(comparer.Compare(before, after).Changes,
                 x => x.Kind == "Key" && x.Property == "Columns");
-            var duplicate = new TableInfo { Id = "duplicate", ObjectId = customer.ObjectId,
-                Code = "Duplicate", Name = "Duplicate" };
+            var duplicate = new TableInfo
+            {
+                Id = "duplicate",
+                ObjectId = customer.ObjectId,
+                Code = "Duplicate",
+                Name = "Duplicate"
+            };
             after.Tables.Add(duplicate);
             Assert.True(comparer.Compare(before, after).Incomplete);
         }
@@ -353,10 +376,18 @@ namespace Bing.Pdm.Tests
         {
             var before = Model();
             var after = Model();
-            after.Tables.Add(new TableInfo { Id = "first", ObjectId = "duplicate-new-guid",
-                Code = "First" });
-            after.Tables.Add(new TableInfo { Id = "second", ObjectId = "duplicate-new-guid",
-                Code = "Second" });
+            after.Tables.Add(new TableInfo
+            {
+                Id = "first",
+                ObjectId = "duplicate-new-guid",
+                Code = "First"
+            });
+            after.Tables.Add(new TableInfo
+            {
+                Id = "second",
+                ObjectId = "duplicate-new-guid",
+                Code = "Second"
+            });
             Assert.Contains(new PdmModelComparer().Compare(before, after).Changes,
                 x => x.Kind == "Table" && x.ChangeType == "Ambiguous" &&
                     x.AfterValue == "duplicate-new-guid");
@@ -431,8 +462,11 @@ namespace Bing.Pdm.Tests
             Assert.NotNull(table.GradientEndColor);
             using (var output = new StringWriter())
             {
-                var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                    FontAvailable = _ => false };
+                var options = new PdmDiagramRenderOptions
+                {
+                    Style = PdmDiagramStyle.PowerDesigner,
+                    FontAvailable = _ => false
+                };
                 new PdmExporter().WriteDiagram(model, diagram, output, options);
                 Assert.Contains("linearGradient", output.ToString());
                 Assert.Contains("x2=\"1\" y2=\"1\"", output.ToString());
@@ -522,8 +556,11 @@ namespace Bing.Pdm.Tests
             var diagram = Assert.Single(model.AllPhysicalDiagrams);
             using (var output = new StringWriter())
             {
-                var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                    FontAvailable = _ => true };
+                var options = new PdmDiagramRenderOptions
+                {
+                    Style = PdmDiagramStyle.PowerDesigner,
+                    FontAvailable = _ => true
+                };
                 new PdmExporter().WriteDiagram(model, diagram, output, options);
                 var svg = output.ToString();
                 Assert.Contains("PK Orders", svg);
@@ -553,7 +590,7 @@ namespace Bing.Pdm.Tests
             workspace.Add("remote", remote);
             var diagram = Assert.Single(local.AllPhysicalDiagrams);
             diagram.Symbols.Single(x => x.Id == "o7").ObjectAddress = new PdmObjectAddress
-                { ModelKey = "remote", PdmId = "o9" };
+            { ModelKey = "remote", PdmId = "o9" };
             using (var output = new StringWriter())
             {
                 new PdmExporter().WriteDiagram(workspace, "local", diagram, output,
@@ -576,8 +613,11 @@ namespace Bing.Pdm.Tests
             var table = model.AllTables.Single(x => x.Id == "o9");
             Assert.Equal(2, table.Keys.Count);
             Assert.Equal(new[] { "o12" }, table.Keys.Single(x => x.Id == "o204").ColumnIds);
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = _ => true };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = _ => true
+            };
             using (var output = new StringWriter())
             {
                 new PdmExporter().WriteDiagram(model, Assert.Single(model.AllPhysicalDiagrams), output,
@@ -665,8 +705,11 @@ namespace Bing.Pdm.Tests
             Assert.Equal("7", area.SubSymbols[1].DashStyle);
             using (var writer = new StringWriter())
             {
-                var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                    FontAvailable = _ => true };
+                var options = new PdmDiagramRenderOptions
+                {
+                    Style = PdmDiagramStyle.PowerDesigner,
+                    FontAvailable = _ => true
+                };
                 new PdmExporter().WriteDiagram(model, diagram, writer, options);
                 var svg = writer.ToString();
                 Assert.Contains("<rect width=\"100%\" height=\"100%\" fill=\"#ffffff\"/>", svg);
@@ -705,8 +748,11 @@ namespace Bing.Pdm.Tests
         {
             var fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "native-shapes.pdm");
             var missing = new PdmReader().ReadFromFile(fixture);
-            var missingOptions = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = _ => true };
+            var missingOptions = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = _ => true
+            };
             using (var writer = new StringWriter())
                 new PdmExporter().WriteDiagram(missing, missing.AllPhysicalDiagrams.Single(), writer,
                     missingOptions);
@@ -724,8 +770,11 @@ namespace Bing.Pdm.Tests
                 Assert.Contains(new PdmModelComparer().Compare(missing, model).Changes, x =>
                     x.Kind == "Reference" && x.Property == "ForeignKeyConstraintName" &&
                     x.AfterValue == "FK_SAVED_NAME");
-                var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                    FontAvailable = _ => true };
+                var options = new PdmDiagramRenderOptions
+                {
+                    Style = PdmDiagramStyle.PowerDesigner,
+                    FontAvailable = _ => true
+                };
                 using (var writer = new StringWriter())
                 {
                     new PdmExporter().WriteDiagram(model, model.AllPhysicalDiagrams.Single(), writer,
@@ -761,8 +810,11 @@ namespace Bing.Pdm.Tests
             Assert.Equal(style, reference.DashStyle);
             using (var writer = new StringWriter())
             {
-                var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                    FontAvailable = _ => true };
+                var options = new PdmDiagramRenderOptions
+                {
+                    Style = PdmDiagramStyle.PowerDesigner,
+                    FontAvailable = _ => true
+                };
                 new PdmExporter().WriteDiagram(model, diagram, writer, options);
                 Assert.Contains("stroke-dasharray=\"" + pattern + "\"", writer.ToString());
                 Assert.DoesNotContain(options.Diagnostics, x => x.Code == "UNSUPPORTED_DIAGRAM_STYLE");
@@ -789,8 +841,11 @@ namespace Bing.Pdm.Tests
             var table = diagram.AllSymbols.First(x => x.Kind == "TableSymbol");
             table.FontList = "STRN 0 Arial,8,N\nColumns 0 Missing Font,8,N";
             table.PenStyle = "99";
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = family => family == "Arial" };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = family => family == "Arial"
+            };
             using (var writer = new StringWriter())
                 new PdmExporter().WriteDiagram(model, diagram, writer, options);
             Assert.Contains(options.Diagnostics, x => x.SourceId == table.Id &&
@@ -811,8 +866,11 @@ namespace Bing.Pdm.Tests
             var diagram = model.AllPhysicalDiagrams.Single();
             diagram.DisplayPreferences = "[DisplayPreferences\\Object]\nTable.Keys=Yes\n" +
                 "Table.Triggers=Yes\nTable.Columns._Filter=CustomFilter";
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = _ => true };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = _ => true
+            };
             using (var writer = new StringWriter())
                 new PdmExporter().WriteDiagram(model, diagram, writer, options);
             Assert.DoesNotContain(options.Diagnostics, x => x.SourceId == diagram.Id &&
@@ -844,8 +902,12 @@ namespace Bing.Pdm.Tests
                 var input = Path.Combine(directory, "native.json");
                 using (var writer = new StreamWriter(input))
                     new PdmExporter().Write(model, PdmExportFormat.Json, writer);
-                var start = new ProcessStartInfo("dotnet") { UseShellExecute = false,
-                    RedirectStandardOutput = true, RedirectStandardError = true };
+                var start = new ProcessStartInfo("dotnet")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
                 foreach (var value in new[] { tool, "export", input,
                     Path.Combine(directory, "output"), "svg", "en", "--diagram-style", "powerdesigner" })
                     start.ArgumentList.Add(value);
@@ -881,8 +943,11 @@ namespace Bing.Pdm.Tests
             Assert.Single(diagram.Symbols.Where(x => x.Kind == "ReferenceSymbol"));
             using (var writer = new StringWriter())
             {
-                var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                    FontAvailable = _ => true };
+                var options = new PdmDiagramRenderOptions
+                {
+                    Style = PdmDiagramStyle.PowerDesigner,
+                    FontAvailable = _ => true
+                };
                 new PdmExporter().WriteDiagram(model, diagram, writer, options);
                 var svg = XDocument.Parse(writer.ToString());
                 XNamespace ns = "http://www.w3.org/2000/svg";
@@ -911,8 +976,11 @@ namespace Bing.Pdm.Tests
             var table = model.AllTables.Single(x => x.Id == "o9");
             Assert.Equal(new[] { "IX_Orders_Name", "IX_Orders_ID" },
                 table.Indexes.Select(x => x.Code));
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = _ => true };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = _ => true
+            };
             using (var output = new StringWriter())
             {
                 new PdmExporter().WriteDiagram(model, Assert.Single(model.AllPhysicalDiagrams),
@@ -1016,8 +1084,12 @@ namespace Bing.Pdm.Tests
         /// </summary>
         private static int Run(string tool, params string[] arguments)
         {
-            var start = new ProcessStartInfo("dotnet") { UseShellExecute = false,
-                RedirectStandardOutput = true, RedirectStandardError = true };
+            var start = new ProcessStartInfo("dotnet")
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
             start.ArgumentList.Add(tool);
             foreach (var value in arguments) start.ArgumentList.Add(value);
             using (var process = Process.Start(start))

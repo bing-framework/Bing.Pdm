@@ -129,7 +129,8 @@ namespace Bing.Pdm.Models
                 Add(replication.Id, replication, _replications);
                 _links.Add(new PdmReplicationLinkInfo
                 {
-                    Id = replication.Id, OriginalId = replication.OriginalId,
+                    Id = replication.Id,
+                    OriginalId = replication.OriginalId,
                     ReplicaObjectRef = replication.ReplicaObjectRef
                 });
             }
@@ -138,8 +139,10 @@ namespace Bing.Pdm.Models
                 Add(child.Id, child, _children);
                 _links.Add(new PdmReplicationLinkInfo
                 {
-                    Id = child.Id, OriginalId = child.OriginalId,
-                    ReplicaObjectRef = child.ReplicaObjectRef, ParentReplicationId = child.ParentReplicationId
+                    Id = child.Id,
+                    OriginalId = child.OriginalId,
+                    ReplicaObjectRef = child.ReplicaObjectRef,
+                    ParentReplicationId = child.ParentReplicationId
                 });
             }
         }

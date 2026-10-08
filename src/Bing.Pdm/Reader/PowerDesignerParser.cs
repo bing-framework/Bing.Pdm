@@ -226,8 +226,13 @@ namespace Bing.Pdm.Reader
             }
             foreach (var triggerNode in Objects(node, "Triggers", "Trigger"))
             {
-                var trigger = new PdmTriggerInfo { TableId = table.Id,
-                    Timing = Value(triggerNode, "Time") ?? Value(triggerNode, "Timing"), Event = Value(triggerNode, "Event"), Body = Value(triggerNode, "Text") ?? Value(triggerNode, "Body") };
+                var trigger = new PdmTriggerInfo
+                {
+                    TableId = table.Id,
+                    Timing = Value(triggerNode, "Time") ?? Value(triggerNode, "Timing"),
+                    Event = Value(triggerNode, "Event"),
+                    Body = Value(triggerNode, "Text") ?? Value(triggerNode, "Body")
+                };
                 ReadCommon(triggerNode, trigger);
                 ReadUnknownAttributes(triggerNode, trigger.RawAttributes, "Time", "Timing", "Event", "Text", "Body");
                 table.Triggers.Add(trigger);
@@ -365,21 +370,31 @@ namespace Bing.Pdm.Reader
             }
             var symbol = new DiagramSymbolInfo
             {
-                Id = node.GetAttribute("Id"), Kind = kind, ObjectId = ObjectRef(node, "Object"),
+                Id = node.GetAttribute("Id"),
+                Kind = kind,
+                ObjectId = ObjectRef(node, "Object"),
                 RawObjectRef = ObjectRef(node, "Object"),
                 SourceSymbolId = ObjectRef(node, "SourceSymbol"),
                 DestinationSymbolId = ObjectRef(node, "DestinationSymbol"),
-                Text = RtfText.Decode(Value(node, "Text")), RawText = Value(node, "Text"),
+                Text = RtfText.Decode(Value(node, "Text")),
+                RawText = Value(node, "Text"),
                 SymbolType = Value(node, "SymbolType"),
                 LineColor = Color(Value(node, "LineColor")),
-                FillColor = Color(Value(node, "FillColor")), ShadowColor = Color(Value(node, "ShadowColor")),
-                FontList = Value(node, "FontList"), FontName = Value(node, "FontName"),
-                TextStyle = Value(node, "TextStyle"), DashStyle = Value(node, "DashStyle"),
+                FillColor = Color(Value(node, "FillColor")),
+                ShadowColor = Color(Value(node, "ShadowColor")),
+                FontList = Value(node, "FontList"),
+                FontName = Value(node, "FontName"),
+                TextStyle = Value(node, "TextStyle"),
+                DashStyle = Value(node, "DashStyle"),
                 DisplayPreferences = Value(node, "DisplayPreferences"),
-                CornerStyle = Value(node, "CornerStyle"), ArrowStyle = Value(node, "ArrowStyle"),
-                PenStyle = Value(node, "PenStyle"), LineWidth = Value(node, "LineWidth"),
-                BrushStyle = Value(node, "BrushStyle"), GradientFillMode = Value(node, "GradientFillMode"),
-                GradientEndColor = Color(Value(node, "GradientEndColor")), Rect = rect
+                CornerStyle = Value(node, "CornerStyle"),
+                ArrowStyle = Value(node, "ArrowStyle"),
+                PenStyle = Value(node, "PenStyle"),
+                LineWidth = Value(node, "LineWidth"),
+                BrushStyle = Value(node, "BrushStyle"),
+                GradientFillMode = Value(node, "GradientFillMode"),
+                GradientEndColor = Color(Value(node, "GradientEndColor")),
+                Rect = rect
             };
             symbol.RichTextSegments.AddRange(RtfText.DecodeSegments(symbol.RawText));
             var siblings = node.ParentNode?.ChildNodes.OfType<XmlElement>()
@@ -620,7 +635,7 @@ namespace Bing.Pdm.Reader
                     yield return table;
                     foreach (var column in table.Columns) yield return column;
                     foreach (var key in table.Keys) yield return key;
-                foreach (var trigger in table.Triggers) yield return trigger;
+                    foreach (var trigger in table.Triggers) yield return trigger;
                     foreach (var index in table.Indexes)
                     {
                         yield return index;

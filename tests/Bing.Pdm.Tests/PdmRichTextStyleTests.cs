@@ -86,8 +86,11 @@ namespace Bing.Pdm.Tests
         public void ChecksFontsDeclaredOnlyInRtfRuns()
         {
             var model = ReadModel();
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = name => name != "Times New Roman" };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = name => name != "Times New Roman"
+            };
             using var output = new StringWriter();
             new PdmExporter().WriteDiagram(model, model.AllPhysicalDiagrams.Single(), output, options);
             Assert.Contains(options.Diagnostics, x => x.Code == "MISSING_DIAGRAM_FONT" && x.SourceId == "note"

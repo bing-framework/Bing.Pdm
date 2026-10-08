@@ -91,8 +91,13 @@ namespace Bing.Pdm
                         current.ParagraphEnd = true; lines.Add(current); current = new Line(); continue;
                     }
                     if (text == "\t") text = "    ";
-                    var glyph = new Glyph { Text = text, Style = segment,
-                        Family = segment.FontFamily ?? family, Size = segment.FontSize.HasValue ? PdmDiagramFontMetrics.NativeSize(segment.FontSize.Value * 100) : size };
+                    var glyph = new Glyph
+                    {
+                        Text = text,
+                        Style = segment,
+                        Family = segment.FontFamily ?? family,
+                        Size = segment.FontSize.HasValue ? PdmDiagramFontMetrics.NativeSize(segment.FontSize.Value * 100) : size
+                    };
                     glyph.Width = PdmDiagramFontMetrics.Measure(text, glyph.Size, glyph.Family,
                         segment.Bold, segment.Italic, options, sourceId);
                     if (current.Glyphs.Count > 0 && current.Width + glyph.Width > Math.Max(1, width))

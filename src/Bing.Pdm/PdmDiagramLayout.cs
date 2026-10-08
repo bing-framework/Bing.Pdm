@@ -165,13 +165,23 @@ namespace Bing.Pdm
         {
             if (options?.MeasureText != null)
             {
-                var width = options.MeasureText(new PdmDiagramTextMeasureInfo { Text = text ?? string.Empty,
-                    FontFamily = fontFamily, FontSize = fontSize, Bold = bold, Italic = italic });
+                var width = options.MeasureText(new PdmDiagramTextMeasureInfo
+                {
+                    Text = text ?? string.Empty,
+                    FontFamily = fontFamily,
+                    FontSize = fontSize,
+                    Bold = bold,
+                    Italic = italic
+                });
                 if (!double.IsNaN(width) && !double.IsInfinity(width) && width >= 0) return width;
             }
             if (options != null && !options.Diagnostics.Any(x => x.Code == "APPROXIMATE_FONT_METRICS" && x.SourceId == sourceId))
-                options.Diagnostics.Add(new Bing.Pdm.Models.PdmDiagnostic { Code = "APPROXIMATE_FONT_METRICS", SourceId = sourceId,
-                    Message = "A font measurement provider is unavailable; text widths are estimated." });
+                options.Diagnostics.Add(new Bing.Pdm.Models.PdmDiagnostic
+                {
+                    Code = "APPROXIMATE_FONT_METRICS",
+                    SourceId = sourceId,
+                    Message = "A font measurement provider is unavailable; text widths are estimated."
+                });
             return EstimateColumnWidth(text, fontSize, fontFamily);
         }
 
@@ -198,19 +208,46 @@ namespace Bing.Pdm
             if (value >= '0' && value <= '9') return 556;
             switch (value)
             {
-                case ' ': case 'I': case 'f': case 't': case '(': case ')':
+                case ' ':
+                case 'I':
+                case 'f':
+                case 't':
+                case '(':
+                case ')':
                     return value == '(' || value == ')' ? 333 : 278;
                 case 'i': case 'j': case 'l': return 222;
                 case 'r': case '-': return 333;
-                case 'c': case 'k': case 's': case 'v': case 'x': case 'y': case 'z':
+                case 'c':
+                case 'k':
+                case 's':
+                case 'v':
+                case 'x':
+                case 'y':
+                case 'z':
                     return 500;
-                case 'a': case 'b': case 'd': case 'e': case 'g': case 'h':
-                case 'n': case 'o': case 'p': case 'q': case 'u': return 556;
+                case 'a':
+                case 'b':
+                case 'd':
+                case 'e':
+                case 'g':
+                case 'h':
+                case 'n':
+                case 'o':
+                case 'p':
+                case 'q':
+                case 'u': return 556;
                 case 'm': case 'M': return 833;
                 case 'w': return 722;
                 case 'C': case 'D': case 'H': case 'N': case 'R': case 'U': return 722;
-                case 'A': case 'B': case 'E': case 'K': case 'P': case 'S':
-                case 'V': case 'X': case 'Y': return 667;
+                case 'A':
+                case 'B':
+                case 'E':
+                case 'K':
+                case 'P':
+                case 'S':
+                case 'V':
+                case 'X':
+                case 'Y': return 667;
                 case 'F': case 'T': case 'Z': return 611;
                 case 'G': case 'O': case 'Q': return 778;
                 case 'J': return 500;

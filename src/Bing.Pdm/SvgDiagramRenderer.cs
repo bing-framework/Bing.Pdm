@@ -118,8 +118,12 @@ namespace Bing.Pdm
             foreach (var value in unsupported)
                 if (!options.Diagnostics.Any(x => x.Code == "UNSUPPORTED_DIAGRAM_STYLE" &&
                     x.SourceId == diagram.Id && x.Message.Contains(value)))
-                    options.Diagnostics.Add(new PdmDiagnostic { Code = "UNSUPPORTED_DIAGRAM_STYLE",
-                        SourceId = diagram.Id, Message = value + " is not rendered in PowerDesigner mode." });
+                    options.Diagnostics.Add(new PdmDiagnostic
+                    {
+                        Code = "UNSUPPORTED_DIAGRAM_STYLE",
+                        SourceId = diagram.Id,
+                        Message = value + " is not rendered in PowerDesigner mode."
+                    });
             if (display.ShowForeignKeyConstraintName)
                 foreach (var symbol in diagram.AllSymbols.Where(x => x.Kind == "ReferenceSymbol"))
                     if ((model.Lookup == null ||
@@ -127,9 +131,12 @@ namespace Bing.Pdm
                         string.IsNullOrEmpty(reference.ForeignKeyConstraintName)) &&
                         !options.Diagnostics.Any(x => x.Code == "UNRESOLVED_REFERENCE_LABEL" &&
                             x.SourceId == symbol.Id))
-                        options.Diagnostics.Add(new PdmDiagnostic { Code = "UNRESOLVED_REFERENCE_LABEL",
+                        options.Diagnostics.Add(new PdmDiagnostic
+                        {
+                            Code = "UNRESOLVED_REFERENCE_LABEL",
                             SourceId = symbol.Id,
-                            Message = "Foreign key constraint name is not stored in the PDM; reference code is shown." });
+                            Message = "Foreign key constraint name is not stored in the PDM; reference code is shown."
+                        });
         }
 
         /// <summary>
@@ -164,7 +171,7 @@ namespace Bing.Pdm
             PdmTableDisplayPreferences display, PdmWorkspace workspace, string modelKey)
         {
             if (!display.ShowTriggers || symbol.Kind != "TableSymbol" || IsExternal(symbol, workspace, modelKey) ||
-                model.Lookup == null || !model.Lookup.TryGetTable(symbol.ObjectId, out var table) ) return 0;
+                model.Lookup == null || !model.Lookup.TryGetTable(symbol.ObjectId, out var table)) return 0;
             var preceding = NativeKeyPaneHeight(model, symbol, display, workspace, modelKey) +
                 NativeIndexPaneHeight(model, symbol, display, workspace, modelKey);
             return (preceding > 0 ? 1275 : 750) + Math.Max(0, table.Triggers.Count - 1) * 975;
@@ -200,8 +207,12 @@ namespace Bing.Pdm
                         options.FontAvailable(font) ? null : "MISSING_DIAGRAM_FONT";
                     if (code != null && !options.Diagnostics.Any(x => x.Code == code &&
                         x.SourceId == symbol.Id && x.Message.Contains("'" + font + "'")))
-                        options.Diagnostics.Add(new PdmDiagnostic { Code = code, SourceId = symbol.Id,
-                            Message = "Diagram font '" + font + "' is not confirmed available." });
+                        options.Diagnostics.Add(new PdmDiagnostic
+                        {
+                            Code = code,
+                            SourceId = symbol.Id,
+                            Message = "Diagram font '" + font + "' is not confirmed available."
+                        });
                 }
                 if ((!string.IsNullOrEmpty(symbol.LineWidth) && !int.TryParse(symbol.LineWidth, out _)) ||
                     (!string.IsNullOrEmpty(symbol.PenStyle) && symbol.PenStyle != "0") ||
@@ -219,8 +230,12 @@ namespace Bing.Pdm
                     (!string.IsNullOrEmpty(symbol.CornerStyle) && symbol.Kind != "ReferenceSymbol" &&
                         symbol.CornerStyle != "0" && symbol.CornerStyle != "1"))
                     if (!options.Diagnostics.Any(x => x.Code == "UNSUPPORTED_DIAGRAM_STYLE" && x.SourceId == symbol.Id))
-                        options.Diagnostics.Add(new PdmDiagnostic { Code = "UNSUPPORTED_DIAGRAM_STYLE",
-                            SourceId = symbol.Id, Message = "Diagram style cannot be interpreted." });
+                        options.Diagnostics.Add(new PdmDiagnostic
+                        {
+                            Code = "UNSUPPORTED_DIAGRAM_STYLE",
+                            SourceId = symbol.Id,
+                            Message = "Diagram style cannot be interpreted."
+                        });
             }
         }
 
@@ -504,8 +519,12 @@ namespace Bing.Pdm
                 {
                     var include = options.ColumnFilter(table, column, display.UnsupportedColumnFilter);
                     if (!include.HasValue && !options.Diagnostics.Any(x => x.Code == "UNSUPPORTED_DIAGRAM_STYLE" && x.SourceId == sourceId))
-                        options.Diagnostics.Add(new PdmDiagnostic { Code = "UNSUPPORTED_DIAGRAM_STYLE", SourceId = sourceId,
-                            Message = "Column filter could not interpret: " + display.UnsupportedColumnFilter });
+                        options.Diagnostics.Add(new PdmDiagnostic
+                        {
+                            Code = "UNSUPPORTED_DIAGRAM_STYLE",
+                            SourceId = sourceId,
+                            Message = "Column filter could not interpret: " + display.UnsupportedColumnFilter
+                        });
                     return include ?? true;
                 });
             if (display.ColumnLimit > 0) columns = columns.Take(display.ColumnLimit);
@@ -608,7 +627,7 @@ namespace Bing.Pdm
                 };
             }
             var projected = points.Select(x => new DiagramPointInfo
-                { X = viewport.X(x.X), Y = viewport.Y(x.Y) }).ToList();
+            { X = viewport.X(x.X), Y = viewport.Y(x.Y) }).ToList();
             var sourceSymbol = diagram.AllSymbols.FirstOrDefault(x => x.Id == symbol.SourceSymbolId);
             var targetSymbol = diagram.AllSymbols.FirstOrDefault(x => x.Id == symbol.DestinationSymbolId);
             var sourceBox = sourceSymbol?.Rect;

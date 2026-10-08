@@ -39,7 +39,7 @@ namespace Bing.Pdm.Models
             /// 获取候选对象在工作区中的地址。
             /// </summary>
             public PdmObjectAddress Address => new PdmObjectAddress
-                { ModelKey = Key, PdmId = Value.Id, ObjectId = Value.ObjectId };
+            { ModelKey = Key, PdmId = Value.Id, ObjectId = Value.ObjectId };
         }
 
         /// <summary>
@@ -259,8 +259,12 @@ namespace Bing.Pdm.Models
             if (model.Lookup.TryGetShortcut(rawId, out var shortcut))
             {
                 if (kind == "Shortcut")
-                    return new PdmObjectAddress { ModelKey = key, PdmId = shortcut.Id,
-                        ObjectId = shortcut.ObjectId };
+                    return new PdmObjectAddress
+                    {
+                        ModelKey = key,
+                        PdmId = shortcut.Id,
+                        ObjectId = shortcut.ObjectId
+                    };
                 var address = shortcut.ResolvedTargetAddress;
                 var target = address == null ? null : objects.FirstOrDefault(x =>
                     x.Key == address.ModelKey && x.Value.Id == address.PdmId);

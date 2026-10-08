@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Linq;
+using System.Text;
 using Bing.Pdm.Models;
 using Bing.Pdm.Models.References;
 using Bing.Pdm.Models.Tables;
@@ -101,8 +101,11 @@ namespace Bing.Pdm.Tests
             var shortcut = new PdmShortcutInfo { Id = "shortcut", TargetKind = "Table", TargetId = "PARENT-GUID" };
             scenario.Source.Shortcuts.Add(shortcut);
             scenario.Source.TargetModels.Add(new Bing.Pdm.Models.Others.TargetModelInfo
-                { Id = "target-session", TargetModelId = "{" + guid.ToUpperInvariant() + "}",
-                    SessionShortcutRefs = { shortcut.Id } });
+            {
+                Id = "target-session",
+                TargetModelId = "{" + guid.ToUpperInvariant() + "}",
+                SessionShortcutRefs = { shortcut.Id }
+            });
             scenario.Source.RebuildLookup();
             new PdmWorkspaceResolver().Resolve(scenario.Workspace);
             Assert.Equal("dependency", shortcut.ResolvedTargetAddress.ModelKey);
@@ -197,27 +200,49 @@ namespace Bing.Pdm.Tests
             var parent = new TableInfo { Id = "parent", ObjectId = "parent-guid" };
             var parentColumn = new ColumnInfo { Id = "parent-id", ObjectId = "parent-column-guid" };
             parent.Columns.Add(parentColumn);
-            parent.Keys.Add(new Bing.Pdm.Models.Keys.KeyInfo { Id = "parent-pk", ObjectId = "parent-key-guid",
-                ColumnIds = { parentColumn.Id } });
+            parent.Keys.Add(new Bing.Pdm.Models.Keys.KeyInfo
+            {
+                Id = "parent-pk",
+                ObjectId = "parent-key-guid",
+                ColumnIds = { parentColumn.Id }
+            });
             parent.PrimaryKeyId = "parent-pk";
             dependency.Tables.Add(parent);
             var child = new TableInfo { Id = "child", ObjectId = "child-guid" };
             var childColumn = new ColumnInfo { Id = "parent-id", ObjectId = "child-column-guid" };
             child.Columns.Add(childColumn);
             source.Tables.Add(child);
-            source.References.Add(new ReferenceInfo { Id = "reference", ObjectId = "reference-guid",
-                ParentTableId = "parent", ChildTableId = "child", ParentKeyId = "parent-pk",
-                ParentTableAddress = new PdmObjectAddress { ModelKey = dependencyKey, PdmId = parent.Id,
-                    ObjectId = addressObjectId },
-                ChildTableAddress = new PdmObjectAddress { ModelKey = sourceKey, PdmId = child.Id,
-                    ObjectId = child.ObjectId },
-                ParentKeyAddress = new PdmObjectAddress { ModelKey = dependencyKey, PdmId = parent.PrimaryKeyId,
-                    ObjectId = "parent-key-guid" },
+            source.References.Add(new ReferenceInfo
+            {
+                Id = "reference",
+                ObjectId = "reference-guid",
+                ParentTableId = "parent",
+                ChildTableId = "child",
+                ParentKeyId = "parent-pk",
+                ParentTableAddress = new PdmObjectAddress
+                {
+                    ModelKey = dependencyKey,
+                    PdmId = parent.Id,
+                    ObjectId = addressObjectId
+                },
+                ChildTableAddress = new PdmObjectAddress
+                {
+                    ModelKey = sourceKey,
+                    PdmId = child.Id,
+                    ObjectId = child.ObjectId
+                },
+                ParentKeyAddress = new PdmObjectAddress
+                {
+                    ModelKey = dependencyKey,
+                    PdmId = parent.PrimaryKeyId,
+                    ObjectId = "parent-key-guid"
+                },
                 Joins = { new ReferenceJoinInfo { Id = "join", ParentColumnId = "parent-id",
                     ChildColumnId = "parent-id", ParentColumnAddress = new PdmObjectAddress
                     { ModelKey = dependencyKey, PdmId = parentColumn.Id, ObjectId = "parent-column-guid" },
                     ChildColumnAddress = new PdmObjectAddress { ModelKey = sourceKey, PdmId = childColumn.Id,
-                        ObjectId = childColumn.ObjectId } } } });
+                        ObjectId = childColumn.ObjectId } } }
+            });
             var workspace = new PdmWorkspace();
             workspace.Add(sourceKey, source);
             workspace.Add(dependencyKey, dependency);
@@ -259,10 +284,15 @@ namespace Bing.Pdm.Tests
         /// </summary>
         private static (int ExitCode, string StdOut, string StdErr) RunCli(params string[] arguments)
         {
-            var process = new Process { StartInfo = new ProcessStartInfo("dotnet")
+            var process = new Process
             {
-                UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true
-            } };
+                StartInfo = new ProcessStartInfo("dotnet")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
             foreach (var argument in arguments) process.StartInfo.ArgumentList.Add(argument);
             process.Start();
             var stdout = process.StandardOutput.ReadToEnd();

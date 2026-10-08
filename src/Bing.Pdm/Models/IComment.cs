@@ -1,4 +1,4 @@
-﻿namespace Bing.Pdm.Models
+namespace Bing.Pdm.Models
 {
     /// <summary>
     /// 注释

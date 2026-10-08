@@ -47,8 +47,12 @@ namespace Bing.Pdm.Tests
             Assert.Contains(note.RichTextSegments, x => x.ParagraphAlignment == "Center");
             Assert.Contains(note.RichTextSegments, x => x.ParagraphAlignment == "Right");
             var requests = new List<PdmDiagramTextMeasureInfo>();
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner, FontAvailable = _ => true,
-                MeasureText = request => { requests.Add(request); return StringInfo.ParseCombiningCharacters(request.Text).Length * 400; } };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = _ => true,
+                MeasureText = request => { requests.Add(request); return StringInfo.ParseCombiningCharacters(request.Text).Length * 400; }
+            };
             var svg = Render(model, options);
             XNamespace ns = "http://www.w3.org/2000/svg";
             var node = svg.Descendants(ns + "g").Single(x => (string)x.Attribute("data-symbol-id") == note.Id);
@@ -79,8 +83,11 @@ namespace Bing.Pdm.Tests
             note.RawText = @"{\rtf1}";
             note.RichTextSegments.Clear();
             note.RichTextSegments.Add(new Bing.Pdm.Models.PhysicalDiagrams.PdmRichTextSegmentInfo { Text = note.Text });
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                MeasureText = request => StringInfo.ParseCombiningCharacters(request.Text).Length * 1700 };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                MeasureText = request => StringInfo.ParseCombiningCharacters(request.Text).Length * 1700
+            };
             var svg = Render(model, options);
             XNamespace ns = "http://www.w3.org/2000/svg";
             var node = svg.Descendants(ns + "g").Single(x => (string)x.Attribute("data-symbol-id") == note.Id);
@@ -97,8 +104,12 @@ namespace Bing.Pdm.Tests
         [Fact]
         public void InvalidMeasurementReportsApproximation()
         {
-            var options = new PdmDiagramRenderOptions { Style = PdmDiagramStyle.PowerDesigner,
-                FontAvailable = _ => true, MeasureText = _ => double.NaN };
+            var options = new PdmDiagramRenderOptions
+            {
+                Style = PdmDiagramStyle.PowerDesigner,
+                FontAvailable = _ => true,
+                MeasureText = _ => double.NaN
+            };
             Render(Read("native-paragraphs"), options);
             Assert.Contains(options.Diagnostics, x => x.Code == "APPROXIMATE_FONT_METRICS");
             Assert.False(options.CanCompareToNative);

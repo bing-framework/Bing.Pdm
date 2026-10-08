@@ -1,11 +1,11 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Bing.Pdm;
+using Bing.Pdm.Models;
 using Bing.Pdm.Models.Tables;
 using Bing.Pdm.Reader;
-using Bing.Pdm.Models;
-using Newtonsoft.Json;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 
 namespace Bing.Pdm.Tool;
 
@@ -107,8 +107,12 @@ internal static class Program
         var before = beforeWorkspace == null ? ReadModel(values[1], null) : beforeWorkspace.Models[beforeKey!];
         var after = afterWorkspace == null ? ReadModel(values[2], null) : afterWorkspace.Models[afterKey!];
         var result = new PdmModelComparer().Compare(before, after, new PdmCompareOptions
-        { BeforeWorkspace = beforeWorkspace, AfterWorkspace = afterWorkspace,
-            BeforeModelKey = beforeKey, AfterModelKey = afterKey });
+        {
+            BeforeWorkspace = beforeWorkspace,
+            AfterWorkspace = afterWorkspace,
+            BeforeModelKey = beforeKey,
+            AfterModelKey = afterKey
+        });
         var basename = Path.GetFileNameWithoutExtension(values[1]) + "-to-" + Path.GetFileNameWithoutExtension(values[2]);
         foreach (var format in formats)
             foreach (var input in new[] { values[1], values[2] })
