@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Model xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
+  <o:RootObject Id="r1"><c:Children><o:Model Id="m1">
+    <a:ObjectID>sales-model-guid</a:ObjectID><a:Name>Sales</a:Name><a:Code>Sales</a:Code>
+    <c:TargetModels><o:TargetModel Id="tm1">
+      <a:ObjectID>sales-target-guid</a:ObjectID><a:TargetModelID>warehouse-model-guid</a:TargetModelID>
+      <a:TargetModelURL>warehouse.json</a:TargetModelURL>
+      <c:SessionShortcuts><o:Shortcut Ref="sc1"/></c:SessionShortcuts>
+    </o:TargetModel></c:TargetModels>
+    <c:Tables>
+      <o:Shortcut Id="sc1"><a:ObjectID>sales-shortcut-guid</a:ObjectID>
+        <a:Name>Warehouse item</a:Name><a:Code>WarehouseItem</a:Code>
+        <a:TargetID>warehouse-table-guid</a:TargetID><a:TargetClassID>TABLE</a:TargetClassID>
+      </o:Shortcut>
+      <o:Table Id="o1"><a:ObjectID>sales-table-guid</a:ObjectID>
+        <a:Name>Order</a:Name><a:Code>Order</a:Code>
+        <c:Columns><o:Column Id="o4"><a:ObjectID>sales-column-guid</a:ObjectID>
+          <a:Name>Item ID</a:Name><a:Code>ItemID</a:Code><a:DataType>int</a:DataType>
+        </o:Column></c:Columns>
+      </o:Table>
+    </c:Tables>
+    <c:References><o:Reference Id="ref1"><a:ObjectID>sales-reference-guid</a:ObjectID>
+      <a:Name>Order item</a:Name><a:Code>FK_Order_Item</a:Code>
+      <c:ParentTable><o:Table Ref="sc1"/></c:ParentTable>
+      <c:ChildTable><o:Table Ref="o1"/></c:ChildTable>
+      <c:ParentKey><o:Key Ref="o2"/></c:ParentKey>
+      <c:Joins><o:ReferenceJoin Id="join1">
+        <c:Object1><o:Column Ref="o3"/></c:Object1>
+        <c:Object2><o:Column Ref="o4"/></c:Object2>
+      </o:ReferenceJoin></c:Joins>
+    </o:Reference></c:References>
+    <c:PhysicalDiagrams><o:PhysicalDiagram Id="d1"><a:Name>Sales diagram</a:Name>
+      <c:Symbols><o:TableSymbol Id="s1"><a:Rect>((0,0),(1000,600))</a:Rect>
+        <c:Object><o:Table Ref="sc1"/></c:Object></o:TableSymbol></c:Symbols>
+    </o:PhysicalDiagram></c:PhysicalDiagrams>
+  </o:Model></c:Children></o:RootObject>
+</Model>

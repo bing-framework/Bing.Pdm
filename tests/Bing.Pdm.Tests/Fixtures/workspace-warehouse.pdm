@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Model xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
+  <o:RootObject Id="r1"><c:Children><o:Model Id="m1">
+    <a:ObjectID>warehouse-model-guid</a:ObjectID><a:Name>Warehouse</a:Name><a:Code>Warehouse</a:Code>
+    <c:Tables><o:Table Id="o1"><a:ObjectID>warehouse-table-guid</a:ObjectID>
+      <a:Name>Item</a:Name><a:Code>Item</a:Code>
+      <c:Columns><o:Column Id="o3"><a:ObjectID>warehouse-column-guid</a:ObjectID>
+        <a:Name>Item ID</a:Name><a:Code>ItemID</a:Code><a:DataType>int</a:DataType>
+      </o:Column></c:Columns>
+      <c:Keys><o:Key Id="o2"><a:ObjectID>warehouse-key-guid</a:ObjectID>
+        <a:Name>PK Item</a:Name><a:Code>PK_Item</a:Code>
+        <c:Key.Columns><o:Column Ref="o3"/></c:Key.Columns>
+      </o:Key></c:Keys>
+      <c:PrimaryKey><o:Key Ref="o2"/></c:PrimaryKey>
+    </o:Table></c:Tables>
+  </o:Model></c:Children></o:RootObject>
+</Model>

@@ -1,0 +1,7 @@
+{
+  "WorkspaceVersion": 1,
+  "Models": [
+    { "Key": "sales", "Path": "workspace-sales.pdm" },
+    { "Key": "warehouse", "Path": "workspace-warehouse.pdm" }
+  ]
+}

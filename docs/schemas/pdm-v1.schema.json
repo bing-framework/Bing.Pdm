@@ -1,0 +1,360 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:bing-pdm:schema:v1",
+  "title": "Bing.Pdm JSON model export v1",
+  "type": "object",
+  "required": ["SchemaVersion", "Id"],
+  "properties": {
+    "SchemaVersion": { "const": 1 },
+    "Id": { "type": "string", "minLength": 1 },
+    "ObjectId": { "type": ["string", "null"] },
+    "Name": { "type": ["string", "null"] },
+    "Code": { "type": ["string", "null"] },
+    "CreationDate": { "type": "string" },
+    "Creator": { "type": ["string", "null"] },
+    "ModificationDate": { "type": "string" },
+    "Modifier": { "type": ["string", "null"] },
+    "Comment": { "type": ["string", "null"] },
+    "Version": { "type": ["string", "null"] },
+    "Author": { "type": ["string", "null"] },
+    "DisplayPreferences": { "type": ["string", "null"] },
+    "RepositoryFileName": { "type": ["string", "null"] },
+    "DbmsCode": { "type": ["string", "null"] },
+    "DbmsName": { "type": ["string", "null"] },
+    "Owners": { "type": "array", "items": { "$ref": "#/definitions/owner" } },
+    "Schemas": { "type": "array", "items": { "$ref": "#/definitions/schema" } },
+    "Packages": { "type": "array", "items": { "$ref": "#/definitions/package" } },
+    "Tables": { "type": "array", "items": { "$ref": "#/definitions/table" } },
+    "Shortcuts": { "type": "array", "items": { "$ref": "#/definitions/shortcut" } },
+    "Views": { "type": "array", "items": { "$ref": "#/definitions/view" } },
+    "References": { "type": "array", "items": { "$ref": "#/definitions/reference" } },
+    "PhysicalDiagrams": { "type": "array", "items": { "$ref": "#/definitions/diagram" } },
+    "Diagnostics": { "type": "array", "items": { "$ref": "#/definitions/diagnostic" } },
+    "TargetModels": { "type": "array", "items": { "$ref": "#/definitions/targetModel" } },
+    "Replications": { "type": "array", "items": { "$ref": "#/definitions/replication" } },
+    "SubReplications": { "type": "array", "items": { "$ref": "#/definitions/replication" } }
+  },
+  "anyOf": [
+    { "required": ["Packages"] },
+    { "required": ["Tables"] },
+    { "required": ["Views"] },
+    { "required": ["References"] },
+    { "required": ["PhysicalDiagrams"] }
+  ],
+  "definitions": {
+    "object": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": ["string", "null"] },
+        "ObjectId": { "type": ["string", "null"] },
+        "Name": { "type": ["string", "null"] },
+        "Code": { "type": ["string", "null"] },
+        "CreationDate": { "type": "string" },
+        "Creator": { "type": ["string", "null"] },
+        "ModificationDate": { "type": "string" },
+        "Modifier": { "type": ["string", "null"] },
+        "Comment": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "package": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        {
+          "type": "object",
+          "properties": {
+            "Packages": { "type": "array", "items": { "$ref": "#/definitions/package" } },
+            "Tables": { "type": "array", "items": { "$ref": "#/definitions/table" } },
+            "Shortcuts": { "type": "array", "items": { "$ref": "#/definitions/shortcut" } },
+            "Views": { "type": "array", "items": { "$ref": "#/definitions/view" } },
+            "References": { "type": "array", "items": { "$ref": "#/definitions/reference" } },
+            "PhysicalDiagrams": { "type": "array", "items": { "$ref": "#/definitions/diagram" } },
+            "TargetModels": { "type": "array", "items": { "$ref": "#/definitions/targetModel" } },
+            "Replications": { "type": "array", "items": { "$ref": "#/definitions/replication" } },
+            "SubReplications": { "type": "array", "items": { "$ref": "#/definitions/replication" } }
+          }
+        }
+      ]
+    },
+    "owner": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "Stereotype": { "type": ["string", "null"] }
+        } }
+      ]
+    },
+    "schema": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "SchemaId": { "type": ["string", "null"] },
+          "StereoType": { "type": ["string", "null"] }
+        } }
+      ]
+    },
+    "table": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "Description": { "type": ["string", "null"] },
+          "PackageId": { "type": ["string", "null"] },
+          "OwnerId": { "type": ["string", "null"] },
+          "SchemaId": { "type": ["string", "null"] },
+          "PrimaryKeyId": { "type": ["string", "null"] },
+          "Columns": { "type": "array", "items": { "$ref": "#/definitions/column" } },
+          "Keys": { "type": "array", "items": { "$ref": "#/definitions/key" } },
+          "Indexes": { "type": "array", "items": { "$ref": "#/definitions/index" } },
+          "Triggers": { "type": "array", "items": { "$ref": "#/definitions/trigger" } }
+        } }
+      ]
+    },
+    "column": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "Description": { "type": ["string", "null"] },
+          "DataType": { "type": ["string", "null"] },
+          "Length": { "type": ["string", "null"] },
+          "Precision": { "type": ["string", "null"] },
+          "DefaultValue": { "type": ["string", "null"] },
+          "Mandatory": { "type": "boolean" },
+          "Identity": { "type": "boolean" },
+          "PrimaryKey": { "type": "boolean" }
+        } }
+      ]
+    },
+    "key": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "ColumnIds": { "type": "array", "items": { "type": "string" } },
+          "ColumnAddresses": { "type": "array", "items": { "$ref": "#/definitions/address" } }
+        } }
+      ]
+    },
+    "index": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "Unique": { "type": "boolean" },
+          "ColumnIds": { "type": "array", "items": { "type": "string" } },
+          "IndexColumns": { "type": "array", "items": { "$ref": "#/definitions/indexColumn" } }
+        } }
+      ]
+    },
+    "indexColumn": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "ColumnId": { "type": ["string", "null"] },
+          "ColumnAddress": { "$ref": "#/definitions/address" }
+        } }
+      ]
+    },
+    "trigger": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "TableId": { "type": ["string", "null"] },
+          "Timing": { "type": ["string", "null"] },
+          "Event": { "type": ["string", "null"] },
+          "Body": { "type": ["string", "null"] },
+          "RawAttributes": { "type": "object", "additionalProperties": { "type": "string" } }
+        } }
+      ]
+    },
+    "view": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "PackageId": { "type": ["string", "null"] },
+          "Description": { "type": ["string", "null"] },
+          "Columns": { "type": "array", "items": { "$ref": "#/definitions/column" } },
+          "ViewSQLQuery": { "type": ["string", "null"] },
+          "TaggedSQLQuery": { "type": ["string", "null"] }
+        } }
+      ]
+    },
+    "shortcut": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "TargetId": { "type": ["string", "null"] },
+          "PackageId": { "type": ["string", "null"] },
+          "TargetClassId": { "type": ["string", "null"] },
+          "TargetPackagePath": { "type": ["string", "null"] },
+          "TargetKind": { "type": ["string", "null"] },
+          "ResolvedTargetId": { "type": ["string", "null"] },
+          "ResolvedTargetAddress": { "$ref": "#/definitions/address" }
+        } }
+      ]
+    },
+    "reference": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "ParentTableId": { "type": ["string", "null"] },
+          "ChildTableId": { "type": ["string", "null"] },
+          "ForeignKeyConstraintName": { "type": ["string", "null"] },
+          "ParentTableAddress": { "$ref": "#/definitions/address" },
+          "ChildTableAddress": { "$ref": "#/definitions/address" },
+          "ParentKeyAddress": { "$ref": "#/definitions/address" },
+          "RawParentTableRef": { "type": ["string", "null"] },
+          "RawChildTableRef": { "type": ["string", "null"] },
+          "ParentKeyId": { "type": ["string", "null"] },
+          "Cardinality": { "type": ["string", "null"] },
+          "Joins": { "type": "array", "items": { "$ref": "#/definitions/join" } }
+        } }
+      ]
+    },
+    "join": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "ParentColumnId": { "type": ["string", "null"] },
+          "ChildColumnId": { "type": ["string", "null"] },
+          "ParentColumnAddress": { "$ref": "#/definitions/address" },
+          "ChildColumnAddress": { "$ref": "#/definitions/address" }
+        } }
+      ]
+    },
+    "diagram": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "PackageId": { "type": ["string", "null"] },
+          "DisplayPreferences": { "type": ["string", "null"] },
+          "Symbols": { "type": "array", "items": { "$ref": "#/definitions/symbol" } }
+        } }
+      ]
+    },
+    "symbol": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": ["string", "null"] },
+        "Kind": { "type": ["string", "null"] },
+        "ObjectId": { "type": ["string", "null"] },
+        "FontName": { "type": ["string", "null"] },
+        "TextStyle": { "type": ["string", "null"] },
+        "DashStyle": { "type": ["string", "null"] },
+        "DisplayPreferences": { "type": ["string", "null"] },
+        "ObjectAddress": { "$ref": "#/definitions/address" },
+        "RawObjectRef": { "type": ["string", "null"] },
+        "SourceSymbolId": { "type": ["string", "null"] },
+        "DestinationSymbolId": { "type": ["string", "null"] },
+        "Text": { "type": ["string", "null"] },
+        "SymbolType": { "type": ["string", "null"] },
+        "LineColor": { "type": ["string", "null"] },
+        "FillColor": { "type": ["string", "null"] },
+        "ShadowColor": { "type": ["string", "null"] },
+        "FontList": { "type": ["string", "null"] },
+        "SubSymbols": { "type": "array", "items": { "$ref": "#/definitions/symbol" } },
+        "Points": { "type": "array", "items": { "$ref": "#/definitions/point" } },
+        "Rect": { "$ref": "#/definitions/rectangle" },
+        "DrawOrder": { "type": "integer" },
+        "CornerStyle": { "type": ["string", "null"] },
+        "ArrowStyle": { "type": ["string", "null"] },
+        "PenStyle": { "type": ["string", "null"] },
+        "LineWidth": { "type": ["string", "null"] },
+        "BrushStyle": { "type": ["string", "null"] },
+        "GradientFillMode": { "type": ["string", "null"] },
+        "GradientEndColor": { "type": ["string", "null"] },
+        "RawText": { "type": ["string", "null"] },
+        "RichTextSegments": { "type": "array", "items": { "$ref": "#/definitions/richTextSegment" } }
+      },
+      "additionalProperties": true
+    },
+    "point": { "type": "object", "properties": {
+      "X": { "type": "integer" }, "Y": { "type": "integer" }
+    } },
+    "rectangle": { "type": ["object", "null"], "properties": {
+      "X1": { "type": "integer" }, "Y1": { "type": "integer" },
+      "X2": { "type": "integer" }, "Y2": { "type": "integer" }
+    } },
+    "targetModel": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "TargetModelId": { "type": ["string", "null"] },
+          "TargetUrl": { "type": ["string", "null"] },
+          "TargetId": { "type": ["string", "null"] },
+          "TargetClassId": { "type": ["string", "null"] },
+          "TargetLastModificationDate": { "type": "string" },
+          "SessionShortcutRefs": { "type": "array", "items": { "type": "string" } },
+          "SessionReplicationRefs": { "type": "array", "items": { "type": "string" } },
+          "EmbeddedObjects": { "type": "array", "items": { "$ref": "#/definitions/embeddedObject" } },
+          "EmbeddedReplications": { "type": "array", "items": { "$ref": "#/definitions/replication" } },
+          "EmbeddedSubReplications": { "type": "array", "items": { "$ref": "#/definitions/replication" } },
+          "RawAttributes": { "type": "object", "additionalProperties": { "type": "string" } }
+        } }
+      ]
+    },
+    "richTextSegment": {
+      "type": "object",
+      "properties": {
+        "Text": { "type": ["string", "null"] },
+        "Bold": { "type": "boolean" },
+        "Italic": { "type": "boolean" },
+        "Underline": { "type": "boolean" },
+        "FontSize": { "type": ["integer", "null"] },
+        "FontFamily": { "type": ["string", "null"] },
+        "ForegroundColor": { "type": ["string", "null"] },
+        "ParagraphAlignment": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "embeddedObject": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        { "type": "object", "properties": {
+          "Kind": { "type": ["string", "null"] },
+          "ParentId": { "type": ["string", "null"] },
+          "TargetId": { "type": ["string", "null"] },
+          "RawAttributes": { "type": "object", "additionalProperties": { "type": "string" } }
+        } }
+      ]
+    },
+    "diagnostic": {
+      "type": "object",
+      "properties": {
+        "Code": { "type": ["string", "null"] },
+        "SourceId": { "type": ["string", "null"] },
+        "Message": { "type": ["string", "null"] },
+        "TargetId": { "type": ["string", "null"] },
+        "Role": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "address": {
+      "type": ["object", "null"],
+      "properties": {
+        "ModelKey": { "type": ["string", "null"] },
+        "PdmId": { "type": ["string", "null"] },
+        "ObjectId": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "replication": {
+      "allOf": [
+        { "$ref": "#/definitions/object" },
+        {
+          "type": "object",
+          "properties": {
+            "OriginalId": { "type": ["string", "null"] },
+            "OriginalAddress": { "$ref": "#/definitions/address" },
+            "OriginalClassId": { "type": ["string", "null"] },
+            "ReplicaObjectRef": { "type": ["string", "null"] },
+            "ReplicaObjectAddress": { "$ref": "#/definitions/address" },
+            "ReplicaObjectKind": { "type": ["string", "null"] },
+            "ParentReplicationId": { "type": ["string", "null"] },
+            "SubReplicationRefs": { "type": "array", "items": { "type": "string" } },
+            "SubReplications": { "type": "array", "items": { "$ref": "#/definitions/replication" } },
+            "RawAttributes": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <None Update="Fixtures\*.pdm" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures\workspace.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\schemas\pdm-v1.schema.json" Link="Schemas\pdm-v1.schema.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Remove="TestBase.cs" />
   </ItemGroup>
 
