@@ -195,7 +195,7 @@ namespace Bing.Pdm.Tests
                 Assert.Equal("TYPE_FALLBACK", result.Diagnostics[0].Code);
                 var source = File.ReadAllText(Path.Combine(output, "BadTypes.cs"));
                 Assert.Contains("object Empty", source);
-                Assert.Contains("long Typo", source);
+                Assert.Contains("long? Typo", source);
             }
             finally
             {

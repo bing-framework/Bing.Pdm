@@ -394,6 +394,8 @@ namespace Bing.Pdm.Tests
             Assert.Equal("byte[]", mapper.GetCSharpType(new ColumnInfo { DataType = "timestamp", Mandatory = true }, "MSSQLSRV", "Microsoft SQL Server"));
             Assert.Equal("bool", mapper.GetCSharpType(new ColumnInfo { DataType = "tinyint(1)", Mandatory = true }, "MYSQL", "MySQL"));
             Assert.Equal("uint?", mapper.GetCSharpType(new ColumnInfo { DataType = "int unsigned" }, "MYSQL", "MySQL"));
+            Assert.Equal("uint?", mapper.GetCSharpType(new ColumnInfo { DataType = "int(11) unsigned" }, "MYSQL", "MySQL"));
+            Assert.Equal("DateTimeOffset?", mapper.GetCSharpType(new ColumnInfo { DataType = "time(6) with time zone" }, "PGSQL", "PostgreSQL"));
             Assert.Equal("DateTime?", mapper.GetCSharpType(new ColumnInfo { DataType = "DATE" }, "ORACLE", "Oracle"));
             Assert.Equal("byte[]", mapper.GetCSharpType(new ColumnInfo { DataType = "RAW(16)", Mandatory = true }, "ORACLE", "Oracle"));
             Assert.Equal("decimal", mapper.GetCSharpType(new ColumnInfo { DataType = "NUMBER(12,2)", Mandatory = true }, "ORACLE", "Oracle"));
@@ -409,6 +411,24 @@ namespace Bing.Pdm.Tests
                 new ColumnInfo { Code = "UnknownValue", DataType = "mysterytype" }, "OTHER", "Other DBMS"));
             Assert.Contains("Other DBMS", unsupported.Message);
             Assert.Contains("UnknownValue", unsupported.Message);
+        }
+
+        /// <summary>
+        /// 验证自定义值类型映射与兜底类型的可空性和类型校验。
+        /// </summary>
+        [Fact]
+        public void CustomValueTypesPreserveNullableColumnsAndRejectInvalidTypes()
+        {
+            var mapper = new CSharpTypeMapper();
+            mapper.RegisterFallback("int");
+            mapper.RegisterMapping("special", "Guid");
+            Assert.Equal("int?", mapper.Resolve(new ColumnInfo { DataType = "unknown" }, "MSSQLSRV", "SQL Server").TypeName);
+            Assert.Equal("Guid?", mapper.GetCSharpType(new ColumnInfo { DataType = "special" }, "MSSQLSRV", "SQL Server"));
+            Assert.Equal("int", mapper.GetCSharpType(new ColumnInfo { DataType = "int", Mandatory = true }, "MSSQLSRV", "SQL Server"));
+            Assert.Throws<ArgumentException>(() => mapper.RegisterFallback("void"));
+            Assert.Throws<ArgumentException>(() => mapper.RegisterMapping("special", "System.Void"));
+            Assert.Throws<ArgumentException>(() => mapper.RegisterMapping("special", "class"));
+            Assert.Throws<ArgumentException>(() => mapper.RegisterFallback("System.class"));
         }
 
         /// <summary>
@@ -433,6 +453,32 @@ namespace Bing.Pdm.Tests
                 Assert.Same(table.Columns[0], template.FirstColumn);
                 Assert.Equal("sample", table.Code);
                 Assert.Equal("value", table.Columns[0].Code);
+            }
+            finally
+            {
+                if (Directory.Exists(output)) Directory.Delete(output, true);
+            }
+        }
+
+        /// <summary>
+        /// 验证同名实体不会遮蔽生成属性使用的系统类型。
+        /// </summary>
+        [Fact]
+        public void DefaultEntityTemplateQualifiesFrameworkTypes()
+        {
+            var dateTime = new TableInfo { Code = "DateTime" };
+            dateTime.Columns.Add(new ColumnInfo { Code = "Created", DataType = "datetime", Mandatory = true });
+            var order = new TableInfo { Code = "Order" };
+            order.Columns.Add(new ColumnInfo { Code = "Created", DataType = "datetime", Mandatory = true });
+            var output = Path.Combine(Path.GetTempPath(), "pdm-type-name-" + Guid.NewGuid().ToString("N"));
+            try
+            {
+                EntityGenerator.Generate(new[] { dateTime, order }, output, "Generated.Entities", "MSSQLSRV", "SQL Server");
+                Assert.Contains("global::System.DateTime Created", File.ReadAllText(Path.Combine(output, "DateTime.cs")));
+                Assert.Contains("global::System.DateTime Created", File.ReadAllText(Path.Combine(output, "Order.cs")));
+                var project = Path.Combine(output, "Generated.csproj");
+                File.WriteAllText(project, "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup></Project>");
+                Assert.Equal(0, RunDotnet(output, "build", project, "--nologo", "--verbosity", "quiet").ExitCode);
             }
             finally
             {

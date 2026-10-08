@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Bing.Pdm.Models.Tables;
 
@@ -16,6 +17,16 @@ public sealed class CSharpTypeMapper
     private static readonly Regex TypeNamePattern = new(
         @"^(?:global::)?[_\p{L}][\p{L}\p{Nd}_]*(?:\.[_\p{L}][\p{L}\p{Nd}_]*)*(?:\[\])?$",
         RegexOptions.Compiled);
+    /// <summary>
+    /// 保存需要按值类型处理的常用 CLR 类型名称。
+    /// </summary>
+    private static readonly HashSet<string> ValueTypes = new(StringComparer.Ordinal)
+    {
+        "bool", "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "nint", "nuint",
+        "float", "double", "decimal", "char", "DateTime", "DateTimeOffset", "DateOnly", "TimeOnly",
+        "TimeSpan", "Guid", "Boolean", "Byte", "SByte", "Int16", "UInt16", "Int32", "UInt32",
+        "Int64", "UInt64", "Single", "Double", "Decimal", "Char"
+    };
     /// <summary>
     /// 保存按数据库类型和 DBMS 区分的自定义映射。
     /// </summary>
@@ -35,9 +46,8 @@ public sealed class CSharpTypeMapper
     /// </remarks>
     public void RegisterFallback(string clrType, bool referenceType = true)
     {
-        if (string.IsNullOrWhiteSpace(clrType) || !TypeNamePattern.IsMatch(clrType.Trim()))
-            throw new ArgumentException("The fallback must be a valid C# type name.", nameof(clrType));
-        _fallback = new TypeMapping(clrType.Trim(), referenceType);
+        var type = ValidateClrType(clrType, nameof(clrType));
+        _fallback = new TypeMapping(type, referenceType && !IsKnownValueType(type));
     }
 
     /// <summary>
@@ -71,11 +81,10 @@ public sealed class CSharpTypeMapper
     public void RegisterMapping(string databaseType, string clrType, string? dbms = null, bool referenceType = true)
     {
         var normalizedType = Normalize(databaseType, nameof(databaseType));
-        if (string.IsNullOrWhiteSpace(clrType) || !TypeNamePattern.IsMatch(clrType.Trim()))
-            throw new ArgumentException("The CLR type must be a simple or fully qualified C# type name, optionally ending in [].", nameof(clrType));
+        var type = ValidateClrType(clrType, nameof(clrType));
 
         _customMappings[new MappingKey(NormalizeDbms(dbms), normalizedType)] =
-            new TypeMapping(clrType.Trim(), referenceType);
+            new TypeMapping(type, referenceType && !IsKnownValueType(type));
     }
 
     /// <summary>
@@ -281,8 +290,42 @@ public sealed class CSharpTypeMapper
     /// <returns>不含长度或精度参数的基础类型名称。</returns>
     private static string BaseType(string declaredType)
     {
-        var parameterStart = declaredType.IndexOf('(');
-        return parameterStart < 0 ? declaredType : declaredType.Substring(0, parameterStart).Trim();
+        return Regex.Replace(Regex.Replace(declaredType, @"\([^()]*\)", string.Empty), @"\s+", " ").Trim();
+    }
+
+    /// <summary>
+    /// 校验可用于生成属性的 CLR 类型名称。
+    /// </summary>
+    /// <param name="value">待校验的类型名称。</param>
+    /// <param name="parameterName">异常中的参数名称。</param>
+    /// <returns>去除首尾空白后的类型名称。</returns>
+    private static string ValidateClrType(string? value, string parameterName)
+    {
+        var type = value?.Trim();
+        if (string.IsNullOrEmpty(type) || !TypeNamePattern.IsMatch(type))
+            throw new ArgumentException("The CLR type must be a simple or fully qualified C# type name, optionally ending in [].", parameterName);
+        var bareType = type.StartsWith("global::", StringComparison.Ordinal) ? type.Substring("global::".Length) : type;
+        if (bareType.EndsWith("[]", StringComparison.Ordinal)) bareType = bareType.Substring(0, bareType.Length - 2);
+        var identifiers = bareType.Split('.');
+        if (bareType == "System.Void" || identifiers.Any(identifier =>
+            EntityGenerator.IsReservedIdentifier(identifier) &&
+            (type.StartsWith("global::", StringComparison.Ordinal) || identifiers.Length > 1 ||
+             (!ValueTypes.Contains(identifier) && identifier != "string" && identifier != "object"))))
+            throw new ArgumentException("The CLR type cannot be used for a C# property.", parameterName);
+        return type;
+    }
+
+    /// <summary>
+    /// 判断常用 CLR 类型是否具有值类型语义。
+    /// </summary>
+    /// <param name="type">已校验的 CLR 类型名称。</param>
+    /// <returns>类型为已知值类型时返回 true，否则返回 false。</returns>
+    private static bool IsKnownValueType(string type)
+    {
+        if (type.EndsWith("[]", StringComparison.Ordinal)) return false;
+        var name = type.StartsWith("global::", StringComparison.Ordinal) ? type.Substring("global::".Length) : type;
+        if (name.StartsWith("System.", StringComparison.Ordinal)) name = name.Substring("System.".Length);
+        return ValueTypes.Contains(name);
     }
 
     /// <summary>

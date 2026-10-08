@@ -100,6 +100,14 @@ public sealed class CSharpEntityProperty
 /// </summary>
 public sealed class DefaultCSharpEntityTemplate : ICSharpEntityTemplate
 {
+    /// <summary>
+    /// 保存可能与实体名称冲突的 CLR 系统类型名称。
+    /// </summary>
+    private static readonly HashSet<string> FrameworkTypes = new(StringComparer.Ordinal)
+    {
+        "DateTime", "DateTimeOffset", "DateOnly", "TimeOnly", "TimeSpan", "Guid"
+    };
+
     /// <inheritdoc />
     public string Render(CSharpEntityTemplateContext context)
     {
@@ -113,8 +121,22 @@ public sealed class DefaultCSharpEntityTemplate : ICSharpEntityTemplate
         source.AppendLine($"public class {context.EntityName}");
         source.AppendLine("{");
         foreach (var property in context.Properties)
-            source.AppendLine($"    public {property.ClrType} {property.Name} {{ get; set; }}");
+            source.AppendLine($"    public {SourceType(property.ClrType)} {property.Name} {{ get; set; }}");
         source.AppendLine("}");
         return source.ToString();
+    }
+
+    /// <summary>
+    /// 限定可能被生成实体遮蔽的系统类型。
+    /// </summary>
+    /// <param name="type">已解析的 CLR 类型名称。</param>
+    /// <returns>适合写入实体属性声明的类型名称。</returns>
+    private static string SourceType(string type)
+    {
+        if (type.StartsWith("System.", StringComparison.Ordinal)) return "global::" + type;
+        var suffix = type.EndsWith("[]", StringComparison.Ordinal) ? "[]"
+            : type.EndsWith("?", StringComparison.Ordinal) ? "?" : string.Empty;
+        var name = type.Substring(0, type.Length - suffix.Length);
+        return FrameworkTypes.Contains(name) ? "global::System." + name + suffix : type;
     }
 }
