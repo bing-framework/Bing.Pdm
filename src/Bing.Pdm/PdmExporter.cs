@@ -7,6 +7,7 @@ using Bing.Pdm.Models;
 using Bing.Pdm.Models.References;
 using Bing.Pdm.Models.Tables;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Bing.Pdm
 {
@@ -94,6 +95,18 @@ namespace Bing.Pdm
         /// 当前实例按导出格式注册的自定义模板。
         /// </summary>
         private readonly Dictionary<PdmExportFormat, IPdmExportTemplate> _templates = new Dictionary<PdmExportFormat, IPdmExportTemplate>();
+        /// <summary>
+        /// 当前导出使用的显式模型工作区。
+        /// </summary>
+        private PdmWorkspace _workspace;
+        /// <summary>
+        /// 当前导出模型的工作区键。
+        /// </summary>
+        private string _modelKey;
+        /// <summary>
+        /// 当前导出的图形渲染选项。
+        /// </summary>
+        private PdmDiagramRenderOptions _renderOptions;
 
         /// <summary>
         /// 初始化一个 <see cref="PdmExporter"/> 类型的实例。
@@ -151,7 +164,10 @@ namespace Bing.Pdm
             switch (format)
             {
                 case PdmExportFormat.Json:
-                    writer.Write(JsonConvert.SerializeObject(model, Formatting.Indented));
+                    var json = JObject.FromObject(model);
+                    json.AddFirst(new JProperty("SchemaVersion", Reader.PdmJsonMigrator.CurrentVersion));
+                    if (_workspace != null) json["Diagnostics"] = JArray.FromObject(EffectiveDiagnostics(model));
+                    writer.Write(json.ToString(Formatting.Indented));
                     return;
                 case PdmExportFormat.Markdown:
                     WriteMarkdown(model, writer);
@@ -170,13 +186,73 @@ namespace Bing.Pdm
             }
         }
 
+        /// <summary>
+        /// 使用指定图形风格导出模型。
+        /// </summary>
+        public void Write(PdmInfo model, PdmExportFormat format, TextWriter writer, PdmDiagramRenderOptions options)
+        {
+            _renderOptions = options;
+            try { Write(model, format, writer); }
+            finally { _renderOptions = null; }
+        }
+
+        /// <summary>
+        /// 在工作区上下文中导出指定模型。
+        /// </summary>
+        public void Write(PdmWorkspace workspace, string modelKey, PdmExportFormat format, TextWriter writer)
+        {
+            if (workspace == null) throw new ArgumentNullException(nameof(workspace));
+            if (!workspace.TryGetModel(modelKey, out var model))
+                throw new ArgumentException("Unknown workspace model key.", nameof(modelKey));
+            _workspace = workspace;
+            _modelKey = modelKey;
+            try { Write(model, format, writer); }
+            finally { _workspace = null; _modelKey = null; }
+        }
+
+        /// <summary>
+        /// 在工作区中使用指定图形风格导出模型。
+        /// </summary>
+        public void Write(PdmWorkspace workspace, string modelKey, PdmExportFormat format,
+            TextWriter writer, PdmDiagramRenderOptions options)
+        {
+            _renderOptions = options;
+            try { Write(workspace, modelKey, format, writer); }
+            finally { _renderOptions = null; }
+        }
+
         /// <inheritdoc />
         public void WriteDiagram(PdmInfo model, Bing.Pdm.Models.PhysicalDiagrams.PhysicalDiagramInfo diagram, TextWriter writer)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (diagram == null) throw new ArgumentNullException(nameof(diagram));
             if (writer == null) throw new ArgumentNullException(nameof(writer));
-            SvgDiagramRenderer.Write(model, diagram, writer, false);
+            SvgDiagramRenderer.Write(model, diagram, writer, false, _renderOptions, _workspace, _modelKey);
+        }
+
+        /// <summary>
+        /// 使用指定图形风格导出 SVG。
+        /// </summary>
+        public void WriteDiagram(PdmInfo model, Bing.Pdm.Models.PhysicalDiagrams.PhysicalDiagramInfo diagram,
+            TextWriter writer, PdmDiagramRenderOptions options)
+        {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (diagram == null) throw new ArgumentNullException(nameof(diagram));
+            if (writer == null) throw new ArgumentNullException(nameof(writer));
+            SvgDiagramRenderer.Write(model, diagram, writer, false, options, _workspace, _modelKey);
+        }
+
+        /// <summary>
+        /// 在工作区上下文中导出独立 SVG。
+        /// </summary>
+        public void WriteDiagram(PdmWorkspace workspace, string modelKey,
+            Bing.Pdm.Models.PhysicalDiagrams.PhysicalDiagramInfo diagram, TextWriter writer,
+            PdmDiagramRenderOptions options = null)
+        {
+            if (workspace == null) throw new ArgumentNullException(nameof(workspace));
+            if (!workspace.TryGetModel(modelKey, out var model))
+                throw new ArgumentException("Unknown workspace model key.", nameof(modelKey));
+            SvgDiagramRenderer.Write(model, diagram, writer, false, options, workspace, modelKey);
         }
 
         /// <summary>
@@ -218,8 +294,8 @@ namespace Bing.Pdm
             writer.WriteLine("| " + L("Reference") + " | " + L("Parent") + " | " + L("Child") + " | " + L("Columns") + " | " + L("Cardinality") + " |");
             writer.WriteLine("| --- | --- | --- | --- | --- |");
             foreach (var reference in model.AllReferences)
-                writer.WriteLine("| " + Md(reference.Code) + " | " + Md(TableCode(model, reference.ParentTableId)) +
-                    " | " + Md(TableCode(model, reference.ChildTableId)) + " | " + Md(JoinText(model, reference)) +
+                writer.WriteLine("| " + Md(reference.Code) + " | " + Md(AddressTableCode(model, reference.ParentTableId, reference.ParentTableAddress)) +
+                    " | " + Md(AddressTableCode(model, reference.ChildTableId, reference.ChildTableAddress)) + " | " + Md(JoinText(model, reference)) +
                     " | " + Md(reference.Cardinality) + " |");
             writer.WriteLine();
             if (model.AllViews.Any())
@@ -254,6 +330,7 @@ namespace Bing.Pdm
                 }
                 writer.WriteLine();
             }
+            WriteMarkdownDependencies(model, writer);
             WriteMarkdownDiagnostics(model, writer);
         }
 
@@ -264,9 +341,10 @@ namespace Bing.Pdm
         /// <param name="writer">Markdown 输出。</param>
         private void WriteMarkdownDiagnostics(PdmInfo model, TextWriter writer)
         {
-            if (model.Diagnostics.Count == 0) return;
+            var diagnostics = EffectiveDiagnostics(model);
+            if (diagnostics.Length == 0) return;
             writer.WriteLine("## " + L("Diagnostics") + "\n");
-            foreach (var diagnostic in model.Diagnostics)
+            foreach (var diagnostic in diagnostics)
                 writer.WriteLine("- " + Md(diagnostic.Code) + " (" + Md(diagnostic.SourceId) + "): " + Md(diagnostic.Message));
         }
 
@@ -304,7 +382,7 @@ namespace Bing.Pdm
             }
             writer.WriteLine("</section><section id=\"references\"><h2>" + H(L("References")) + "</h2><div class=\"table-wrap\"><table><thead><tr><th>" + H(L("Reference")) + "</th><th>" + H(L("Parent")) + "</th><th>" + H(L("Child")) + "</th><th>" + H(L("Columns")) + "</th><th>" + H(L("Cardinality")) + "</th></tr></thead><tbody>");
             foreach (var reference in model.AllReferences)
-                writer.WriteLine("<tr id=\"" + HtmlIds.Create("reference", reference.Id) + "\" data-searchable><td>" + H(reference.Code) + "</td><td>" + TableLink(model, reference.ParentTableId) + "</td><td>" + TableLink(model, reference.ChildTableId) + "</td><td>" + H(JoinText(model, reference)) + "</td><td>" + H(reference.Cardinality) + "</td></tr>");
+                writer.WriteLine("<tr id=\"" + HtmlIds.Create("reference", reference.Id) + "\" data-searchable><td>" + H(reference.Code) + "</td><td>" + AddressTableLink(model, reference.ParentTableId, reference.ParentTableAddress) + "</td><td>" + AddressTableLink(model, reference.ChildTableId, reference.ChildTableAddress) + "</td><td>" + H(JoinText(model, reference)) + "</td><td>" + H(reference.Cardinality) + "</td></tr>");
             writer.WriteLine("</tbody></table></div></section><section id=\"views\"><h2>" + H(L("Views")) + "</h2>");
             foreach (var view in model.AllViews)
             {
@@ -326,18 +404,27 @@ namespace Bing.Pdm
             foreach (var diagram in model.AllPhysicalDiagrams)
             {
                 writer.WriteLine("<h3 id=\"" + HtmlIds.Create("diagram", diagram.Id) + "\">" + H(diagram.Name ?? diagram.Code) + "</h3><div class=\"diagram-panel\"><div class=\"diagram-toolbar\"><button type=\"button\" data-zoom=\"out\" aria-label=\"" + H(L("ZoomOut")) + "\" title=\"" + H(L("ZoomOut")) + "\">−</button><button type=\"button\" data-zoom=\"reset\" aria-label=\"" + H(L("ResetZoom")) + "\" title=\"" + H(L("ResetZoom")) + "\">↺</button><button type=\"button\" data-zoom=\"in\" aria-label=\"" + H(L("ZoomIn")) + "\" title=\"" + H(L("ZoomIn")) + "\">+</button></div><div class=\"diagram\">");
-                SvgDiagramRenderer.Write(model, diagram, writer, true);
+                SvgDiagramRenderer.Write(model, diagram, writer, true, _renderOptions, _workspace, _modelKey);
                 writer.WriteLine("</div></div>");
             }
             writer.WriteLine("</section>");
-            if (model.Diagnostics.Count > 0)
+            WriteHtmlDependencies(model, writer);
+            var diagnostics = EffectiveDiagnostics(model);
+            if (diagnostics.Length > 0)
             {
                 writer.WriteLine("<section><h2>" + H(L("Diagnostics")) + "</h2><ul>");
-                foreach (var diagnostic in model.Diagnostics)
+                foreach (var diagnostic in diagnostics)
                     writer.WriteLine("<li><code>" + H(diagnostic.Code) + "</code> " + H(diagnostic.SourceId) + ": " + H(diagnostic.Message) + "</li>");
                 writer.WriteLine("</ul></section>");
             }
-            writer.WriteLine("</main><script>(function(){var search=document.getElementById('dictionary-search');search.addEventListener('input',function(){var q=search.value.trim().toLowerCase();document.querySelectorAll('[data-searchable]').forEach(function(item){item.hidden=q!==''&&item.textContent.toLowerCase().indexOf(q)<0;});});document.querySelectorAll('.diagram-panel').forEach(function(panel){var svg=panel.querySelector('svg');if(!svg)return;var b=svg.viewBox.baseVal;var original={x:b.x,y:b.y,width:b.width,height:b.height};var scale=1;panel.querySelectorAll('[data-zoom]').forEach(function(button){button.addEventListener('click',function(){var action=button.getAttribute('data-zoom');scale=action==='reset'?1:Math.max(0.25,Math.min(4,scale*(action==='in'?1.25:0.8)));var width=original.width/scale;var height=original.height/scale;svg.setAttribute('viewBox',(original.x+(original.width-width)/2)+' '+(original.y+(original.height-height)/2)+' '+width+' '+height);});});});})();</script></body></html>");
+            writer.WriteLine("</main><script>(function(){");
+            writer.WriteLine("var search=document.getElementById('dictionary-search');");
+            writer.WriteLine("function applyFilter(){var q=search.value.trim().toLowerCase();document.querySelectorAll('[data-searchable]').forEach(function(item){item.hidden=q!==''&&item.textContent.toLowerCase().indexOf(q)<0;});}");
+            writer.WriteLine("search.addEventListener('input',applyFilter);");
+            writer.WriteLine("document.addEventListener('click',function(event){var link=event.target.closest&&event.target.closest('a[href^=\"#\"]');if(!link)return;var target=document.getElementById(link.getAttribute('href').slice(1));if(target&&target.hidden){search.value='';applyFilter();}});");
+            writer.WriteLine("window.addEventListener('hashchange',function(){var target=document.getElementById(location.hash.slice(1));if(target&&target.hidden){search.value='';applyFilter();target.scrollIntoView();}});");
+            writer.WriteLine("document.querySelectorAll('.diagram-panel').forEach(function(panel){var svg=panel.querySelector('svg');if(!svg)return;var b=svg.viewBox.baseVal;var original={x:b.x,y:b.y,width:b.width,height:b.height};var scale=1;panel.querySelectorAll('[data-zoom]').forEach(function(button){button.addEventListener('click',function(){var action=button.getAttribute('data-zoom');scale=action==='reset'?1:Math.max(0.25,Math.min(4,scale*(action==='in'?1.25:0.8)));var width=original.width/scale;var height=original.height/scale;svg.setAttribute('viewBox',(original.x+(original.width-width)/2)+' '+(original.y+(original.height-height)/2)+' '+width+' '+height);});});});");
+            writer.WriteLine("})();</script></body></html>");
         }
 
         /// <summary>
@@ -464,6 +551,70 @@ namespace Bing.Pdm
         }
 
         /// <summary>
+        /// 显示跨模型表名称，且仅链接当前模型的表。
+        /// </summary>
+        private string AddressTableLink(PdmInfo model, string id, PdmObjectAddress address)
+        {
+            if (_workspace == null || address == null || address.ModelKey == _modelKey)
+                return TableLink(model, id);
+            return H(AddressTableCode(model, id, address));
+        }
+
+        /// <summary>
+        /// 在工作区上下文中取得表名称。
+        /// </summary>
+        private string AddressTableCode(PdmInfo model, string id, PdmObjectAddress address)
+        {
+            if (_workspace == null || address == null || address.ModelKey == _modelKey)
+                return TableCode(model, id);
+            if (_workspace.TryGetModel(address.ModelKey, out var target) &&
+                target.Lookup.TryGetTable(address.PdmId, out var table))
+                return address.ModelKey + ":" + (table.Code ?? table.Name ?? table.Id);
+            return address.ModelKey + ":" + address.PdmId;
+        }
+
+        /// <summary>
+        /// 写入模型外部依赖和复制来源。
+        /// </summary>
+        private void WriteMarkdownDependencies(PdmInfo model, TextWriter writer)
+        {
+            var links = model.AllReferences.SelectMany(x => new[] { x.ParentTableAddress, x.ChildTableAddress })
+                .Where(x => x != null && x.ModelKey != _modelKey && _workspace != null).Distinct().ToArray();
+            var origins = model.AllReplications.Where(x => x.OriginalAddress != null).ToArray();
+            if (links.Length == 0 && origins.Length == 0) return;
+            writer.WriteLine("## External dependencies and replication origins");
+            writer.WriteLine();
+            foreach (var link in links)
+                writer.WriteLine("- " + Md(AddressTableCode(model, link.PdmId, link)));
+            foreach (var origin in origins)
+                writer.WriteLine("- " + Md(origin.Id) + " <= " + Md(origin.OriginalAddress.ModelKey + ":" + origin.OriginalAddress.PdmId));
+            writer.WriteLine();
+        }
+
+        /// <summary>
+        /// 写入 HTML 外部依赖和复制来源。
+        /// </summary>
+        private void WriteHtmlDependencies(PdmInfo model, TextWriter writer)
+        {
+            var links = model.AllReferences.SelectMany(x => new[] { x.ParentTableAddress, x.ChildTableAddress })
+                .Where(x => x != null && x.ModelKey != _modelKey && _workspace != null).Distinct().ToArray();
+            var origins = model.AllReplications.Where(x => x.OriginalAddress != null).ToArray();
+            if (links.Length == 0 && origins.Length == 0) return;
+            writer.WriteLine("<section><h2>External dependencies and replication origins</h2><ul>");
+            foreach (var link in links)
+                writer.WriteLine("<li>" + H(AddressTableCode(model, link.PdmId, link)) + "</li>");
+            foreach (var origin in origins)
+                writer.WriteLine("<li>" + H(origin.Id) + " &larr; " + H(origin.OriginalAddress.ModelKey + ":" + origin.OriginalAddress.PdmId) + "</li>");
+            writer.WriteLine("</ul></section>");
+        }
+
+        /// <summary>
+        /// 获取当前导出上下文中的有效诊断。
+        /// </summary>
+        private PdmDiagnostic[] EffectiveDiagnostics(PdmInfo model) =>
+            (_workspace == null ? model.Diagnostics.AsEnumerable() : _workspace.GetDiagnostics(_modelKey)).ToArray();
+
+        /// <summary>
         /// 按标识获取表代码。
         /// </summary>
         /// <param name="model">所属 PDM 模型。</param>
@@ -481,8 +632,23 @@ namespace Bing.Pdm
         /// <param name="model">所属 PDM 模型。</param>
         /// <param name="reference">待格式化的引用。</param>
         /// <returns>按父列到子列格式连接的关联文本。</returns>
-        private static string JoinText(PdmInfo model, ReferenceInfo reference) =>
-            string.Join(", ", reference.Joins.Select(join => ColumnCode(model, join.ParentColumnId) + " -> " + ColumnCode(model, join.ChildColumnId)));
+        private string JoinText(PdmInfo model, ReferenceInfo reference) =>
+            string.Join(", ", reference.Joins.Select(join =>
+                AddressColumnCode(model, join.ParentColumnId, join.ParentColumnAddress) + " -> " +
+                AddressColumnCode(model, join.ChildColumnId, join.ChildColumnAddress)));
+
+        /// <summary>
+        /// 在工作区上下文中取得列名称。
+        /// </summary>
+        private string AddressColumnCode(PdmInfo model, string id, PdmObjectAddress address)
+        {
+            if (_workspace == null || address == null || address.ModelKey == _modelKey)
+                return ColumnCode(model, id);
+            if (_workspace.TryGetModel(address.ModelKey, out var target) &&
+                target.Lookup.TryGetColumn(address.PdmId, out var column))
+                return address.ModelKey + ":" + (column.Code ?? column.Name ?? column.Id);
+            return address.ModelKey + ":" + address.PdmId;
+        }
 
         /// <summary>
         /// 按标识获取列代码。

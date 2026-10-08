@@ -64,6 +64,14 @@ namespace Bing.Pdm
         /// 提供 Office 文档导出所需标签的解析器。
         /// </summary>
         private readonly PdmExporter _labels;
+        /// <summary>
+        /// 获取当前导出的显式工作区。
+        /// </summary>
+        private PdmWorkspace _workspace;
+        /// <summary>
+        /// 获取当前模型的工作区键。
+        /// </summary>
+        private string _modelKey;
 
         /// <summary>
         /// 初始化一个 <see cref="PdmOfficeExporter"/> 类型的实例。
@@ -108,6 +116,20 @@ namespace Bing.Pdm
             }
         }
 
+        /// <summary>
+        /// 在工作区上下文中导出 Excel 数据字典。
+        /// </summary>
+        public void WriteExcel(PdmWorkspace workspace, string modelKey, Stream output)
+        {
+            if (workspace == null) throw new ArgumentNullException(nameof(workspace));
+            if (!workspace.TryGetModel(modelKey, out var model))
+                throw new ArgumentException("Unknown workspace model key.", nameof(modelKey));
+            _workspace = workspace;
+            _modelKey = modelKey;
+            try { WriteExcel(model, output); }
+            finally { _workspace = null; _modelKey = null; }
+        }
+
         /// <inheritdoc />
         public void WriteWord(PdmInfo model, Stream output)
         {
@@ -120,6 +142,20 @@ namespace Bing.Pdm
                 AddXml(archive, "word/styles.xml", WriteWordStyles);
                 AddXml(archive, "word/document.xml", writer => WriteDocument(writer, model));
             }
+        }
+
+        /// <summary>
+        /// 在工作区上下文中导出 Word 数据字典。
+        /// </summary>
+        public void WriteWord(PdmWorkspace workspace, string modelKey, Stream output)
+        {
+            if (workspace == null) throw new ArgumentNullException(nameof(workspace));
+            if (!workspace.TryGetModel(modelKey, out var model))
+                throw new ArgumentException("Unknown workspace model key.", nameof(modelKey));
+            _workspace = workspace;
+            _modelKey = modelKey;
+            try { WriteWord(model, output); }
+            finally { _workspace = null; _modelKey = null; }
         }
 
         /// <summary>
@@ -163,9 +199,26 @@ namespace Bing.Pdm
 
             var references = new Sheet(L("SheetReferences"), L("Id"), L("Reference"), L("Parent"), L("Child"), L("ParentKey"), L("Columns"), L("Cardinality"));
             foreach (var reference in model.AllReferences)
-                references.Rows.Add(new[] { reference.Id, reference.Code, TableCode(model, reference.ParentTableId), TableCode(model, reference.ChildTableId),
-                    KeyCode(model, reference.ParentKeyId), JoinText(model, reference), reference.Cardinality });
+                references.Rows.Add(new[] { reference.Id, reference.Code,
+                    TableCode(model, reference.ParentTableId, reference.ParentTableAddress),
+                    TableCode(model, reference.ChildTableId, reference.ChildTableAddress),
+                    KeyCode(model, reference.ParentKeyId, reference.ParentKeyAddress),
+                    JoinText(model, reference), reference.Cardinality });
             sheets.Add(references);
+
+            if (_workspace != null)
+            {
+                var dependencies = new Sheet("External dependencies", "Kind", "Object", "Target");
+                foreach (var reference in model.AllReferences)
+                    foreach (var address in new[] { reference.ParentTableAddress, reference.ChildTableAddress }
+                        .Where(x => x != null && x.ModelKey != _modelKey))
+                        dependencies.Rows.Add(new[] { "Reference", reference.Code,
+                            TableCode(model, address.PdmId, address) });
+                foreach (var replication in model.AllReplications.Where(x => x.OriginalAddress != null))
+                    dependencies.Rows.Add(new[] { "Replication", replication.Id,
+                        replication.OriginalAddress.ToString() });
+                sheets.Add(dependencies);
+            }
 
             var views = new Sheet(L("SheetViews"), L("Id"), L("Package"), L("Code"), L("Name"), L("Description"), L("Comment"), "SQL", L("TaggedSql"));
             foreach (var item in ViewsWithPaths(model))
@@ -181,7 +234,7 @@ namespace Bing.Pdm
             sheets.Add(viewColumns);
 
             var diagnostics = new Sheet(L("SheetDiagnostics"), L("Code"), L("SourceId"), L("Message"));
-            foreach (var diagnostic in model.Diagnostics)
+            foreach (var diagnostic in EffectiveDiagnostics(model))
                 diagnostics.Rows.Add(new[] { diagnostic.Code, diagnostic.SourceId, diagnostic.Message });
             sheets.Add(diagnostics);
             return sheets;
@@ -222,8 +275,21 @@ namespace Bing.Pdm
 
             WriteParagraph(writer, L("References"), "Heading1");
             WriteDocumentTable(writer, new[] { L("Reference"), L("Parent"), L("Child"), L("ParentKey"), L("Columns"), L("Cardinality") },
-                model.AllReferences.Select(reference => new[] { reference.Code, TableCode(model, reference.ParentTableId), TableCode(model, reference.ChildTableId),
-                    KeyCode(model, reference.ParentKeyId), JoinText(model, reference), reference.Cardinality }));
+                model.AllReferences.Select(reference => new[] { reference.Code,
+                    TableCode(model, reference.ParentTableId, reference.ParentTableAddress),
+                    TableCode(model, reference.ChildTableId, reference.ChildTableAddress),
+                    KeyCode(model, reference.ParentKeyId, reference.ParentKeyAddress),
+                    JoinText(model, reference), reference.Cardinality }));
+            if (_workspace != null)
+            {
+                WriteParagraph(writer, "External dependencies and replication origins", "Heading1");
+                foreach (var reference in model.AllReferences)
+                    foreach (var address in new[] { reference.ParentTableAddress, reference.ChildTableAddress }
+                        .Where(x => x != null && x.ModelKey != _modelKey))
+                        WriteParagraph(writer, reference.Code + ": " + TableCode(model, address.PdmId, address));
+                foreach (var replication in model.AllReplications.Where(x => x.OriginalAddress != null))
+                    WriteParagraph(writer, replication.Id + ": " + replication.OriginalAddress);
+            }
 
             WriteParagraph(writer, L("Views"), "Heading1");
             foreach (var item in ViewsWithPaths(model))
@@ -239,11 +305,12 @@ namespace Bing.Pdm
                 if (!string.IsNullOrEmpty(view.TaggedSQLQuery)) WriteParagraph(writer, L("TaggedSql") + ": " + view.TaggedSQLQuery);
             }
 
-            if (model.Diagnostics.Count > 0)
+            var diagnostics = EffectiveDiagnostics(model);
+            if (diagnostics.Length > 0)
             {
                 WriteParagraph(writer, L("Diagnostics"), "Heading1");
                 WriteDocumentTable(writer, new[] { L("Code"), L("SourceId"), L("Message") },
-                    model.Diagnostics.Select(diagnostic => new[] { diagnostic.Code, diagnostic.SourceId, diagnostic.Message }));
+                    diagnostics.Select(diagnostic => new[] { diagnostic.Code, diagnostic.SourceId, diagnostic.Message }));
             }
             writer.WriteStartElement("w", "sectPr", WordNs);
             writer.WriteStartElement("w", "pgSz", WordNs);
@@ -834,9 +901,57 @@ namespace Bing.Pdm
         /// <param name="model">所属 PDM 模型。</param>
         /// <param name="reference">待格式化的引用。</param>
         /// <returns>按父列到子列格式连接的关联文本。</returns>
-        private static string JoinText(PdmInfo model, Bing.Pdm.Models.References.ReferenceInfo reference)
+        private string JoinText(PdmInfo model, Bing.Pdm.Models.References.ReferenceInfo reference)
         {
-            return string.Join(", ", reference.Joins.Select(join => ColumnCode(model, join.ParentColumnId) + " -> " + ColumnCode(model, join.ChildColumnId)));
+            return string.Join(", ", reference.Joins.Select(join =>
+                ColumnCode(model, join.ParentColumnId, join.ParentColumnAddress) + " -> " +
+                ColumnCode(model, join.ChildColumnId, join.ChildColumnAddress)));
+        }
+
+        /// <summary>
+        /// 获取工作区解析后的有效诊断。
+        /// </summary>
+        private PdmDiagnostic[] EffectiveDiagnostics(PdmInfo model) =>
+            (_workspace == null ? model.Diagnostics.AsEnumerable() :
+                _workspace.GetDiagnostics(_modelKey)).ToArray();
+
+        /// <summary>
+        /// 获取限定模型的表名称。
+        /// </summary>
+        private string TableCode(PdmInfo model, string id, PdmObjectAddress address)
+        {
+            if (_workspace == null || address == null || address.ModelKey == _modelKey)
+                return TableCode(model, id);
+            return _workspace.TryGetModel(address.ModelKey, out var target) &&
+                target.Lookup.TryGetTable(address.PdmId, out var table)
+                ? address.ModelKey + ":" + (table.Code ?? table.Name ?? table.Id)
+                : address.ToString();
+        }
+
+        /// <summary>
+        /// 获取限定模型的键名称。
+        /// </summary>
+        private string KeyCode(PdmInfo model, string id, PdmObjectAddress address)
+        {
+            if (_workspace == null || address == null || address.ModelKey == _modelKey)
+                return KeyCode(model, id);
+            return _workspace.TryGetModel(address.ModelKey, out var target) &&
+                target.Lookup.TryGetKey(address.PdmId, out var key)
+                ? address.ModelKey + ":" + (key.Code ?? key.Name ?? key.Id)
+                : address.ToString();
+        }
+
+        /// <summary>
+        /// 获取限定模型的列名称。
+        /// </summary>
+        private string ColumnCode(PdmInfo model, string id, PdmObjectAddress address)
+        {
+            if (_workspace == null || address == null || address.ModelKey == _modelKey)
+                return ColumnCode(model, id);
+            return _workspace.TryGetModel(address.ModelKey, out var target) &&
+                target.Lookup.TryGetColumn(address.PdmId, out var column)
+                ? address.ModelKey + ":" + (column.Code ?? column.Name ?? column.Id)
+                : address.ToString();
         }
 
         /// <summary>

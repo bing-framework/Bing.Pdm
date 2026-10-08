@@ -1,0 +1,19 @@
+<Model xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
+  <o:RootObject Id="root"><c:Children><o:Model Id="model">
+    <a:ObjectID>rich-style-model</a:ObjectID><a:Name>Rich style</a:Name><a:Code>RichStyle</a:Code>
+    <a:DisplayPreferences>[DisplayPreferences\Symbol\TABL]
+Shadow=1</a:DisplayPreferences>
+    <c:Tables><o:Table Id="table"><a:Name>Table</a:Name><a:Code>Table</a:Code>
+      <c:Columns><o:Column Id="column"><a:Name>ID</a:Name><a:Code>ID</a:Code><a:DataType>int</a:DataType></o:Column></c:Columns>
+    </o:Table></c:Tables>
+    <c:PhysicalDiagrams><o:PhysicalDiagram Id="diagram"><a:Name>Styles</a:Name><a:Code>Styles</a:Code>
+      <c:Symbols>
+        <o:TableSymbol Id="red-shadow"><a:Rect>((0,0),(16000,5000))</a:Rect><a:ShadowColor>255</a:ShadowColor><c:Object><o:Table Ref="table"/></c:Object></o:TableSymbol>
+        <o:TableSymbol Id="blue-shadow"><a:Rect>((18000,0),(34000,5000))</a:Rect><a:ShadowColor>16711680</a:ShadowColor><c:Object><o:Table Ref="table"/></c:Object></o:TableSymbol>
+        <o:NoteSymbol Id="note"><a:Rect>((0,6000),(24000,14000))</a:Rect>
+          <a:Text><![CDATA[{\rtf1\ansi\ansicpg936\deff0{\fonttbl{\f0\fnil Arial;}{\f1\fnil Times New Roman;}}{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}\f0 Root {\f1\cf1\ul\fs24 Red {\cf2\b\'c4\'e3\'ba\'c3} Back} End \plain Plain}]]></a:Text>
+        </o:NoteSymbol>
+      </c:Symbols>
+    </o:PhysicalDiagram></c:PhysicalDiagrams>
+  </o:Model></c:Children></o:RootObject>
+</Model>
