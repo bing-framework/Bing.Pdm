@@ -51,8 +51,20 @@ npm test
 ```
 
 将 `PDM_BROWSER_EXECUTABLE` 设置为已安装的 Chromium 内核浏览器（如 Edge）的路径，
-即可复用该浏览器而无需 Playwright 下载的 Chromium。冒烟测试通过
-`dotnet run --no-restore` 调用 CLI，因此首次运行 `npm test` 之前必须先还原解决方案。
+即可复用该浏览器而无需 Playwright 下载的 Chromium。`npm test` 会先构建一次 CLI，
+再运行两组浏览器测试；首次运行前必须先还原解决方案。
+
+仓库的 GitHub Actions 工作流会在推送和拉取请求时运行解决方案构建、测试与离线
+HTML 浏览器测试。四份业务 PDM 不存放在仓库中；在持有这些文件的 Windows 机器上，
+可运行以下独立验收脚本，核对模型数量、诊断、索引列、所有导出格式，并编译生成的实体：
+
+```powershell
+$pdmDir = 'path/to/private-pdm-files'
+./tests/verify-real-pdm.ps1 "$pdmDir/EDI平台.pdm" "$pdmDir/物流平台.pdm" "$pdmDir/仓储管理系统.pdm" "$pdmDir/进销存平台.pdm"
+```
+
+脚本也接受只包含这四份 PDM 的目录，默认将结果保留在系统临时目录下，并在完成时打印路径。
+它不会修改输入文件。
 
 可在仓库根目录通过 `dotnet run --project` 运行 CLI，或用
 `dotnet publish samples/Bing.Pdm.Tool` 发布一次后直接调用可执行文件。无需任何
@@ -69,6 +81,21 @@ dotnet run --project samples/Bing.Pdm.Tool -- generate model.pdm entities Demo.E
 dotnet run --project samples/Bing.Pdm.Tool -- generate model.pdm entities Demo.Entities --fallback-type object
 dotnet test Bing.Pdm.sln
 ```
+
+导出的 JSON 可作为离线模型再次输入 CLI，无需重新读取原始 PDM：
+
+```powershell
+dotnet run --project samples/Bing.Pdm.Tool -- export model.pdm out json
+dotnet run --project samples/Bing.Pdm.Tool -- export out/model.json dictionary md,html,svg zh
+dotnet run --project samples/Bing.Pdm.Tool -- generate out/model.json entities Demo.Entities --fallback-type object
+```
+
+`export` 和 `generate` 根据 `.pdm` 或 `.json` 扩展名选择读取器。其他扩展名需传入
+`--input-format pdm` 或 `--input-format json`；未知格式会报错。若导出文件或生成的
+实体文件与输入文件路径相同，命令会在写入前拒绝覆盖。程序中可使用
+`PdmJsonReader.ReadFromFile` 或 `Read(Stream)` 读取同一模型；流入口不关闭调用方的流。
+修改模型对象集合后调用 `PdmInfo.RebuildLookup()` 更新按 ID 查找的索引。该操作保留
+现有关系和诊断，不重新解析或校验引用。
 
 可在 `tests/browser-smoke` 目录下用 Playwright 运行离线 HTML 浏览器冒烟测试
 （`npm ci`、`npx playwright install chromium`，然后 `npm test`）。将
@@ -90,8 +117,9 @@ DBMS 划分供应商特定类型的作用范围。可重复添加 `--map` 选项
 注册。生成前会先扫描全部列再写文件。默认情况下，所有缺失与不受支持的类型会一并
 报告，且不会创建输出目录。`--fallback-type object` 会显式地将每个无法解析的类型
 替换为 `object`，并打印 `TYPE_FALLBACK [Table.Column]` 警告。它从不猜测拼写错误
-的 SQL 类型。映射优先级依次为：DBMS 精确/基础匹配、DBMS 内置映射、全局精确/基础
-匹配，最后是显式兜底。CLI 程序集还公开了 `CSharpTypeMapper.RegisterFallback`、
+的 SQL 类型。映射优先级依次为：DBMS 自定义精确/基础匹配、全局自定义精确/基础匹配、
+厂商及通用内置映射，最后是显式兜底。已知 CLR 值类型用于可空列时会添加 `?`，
+`void` 等不能用作属性类型的名称会被拒绝。CLI 程序集还公开了 `CSharpTypeMapper.RegisterFallback`、
 `Resolve` 以及 `EntityGenerator.GenerateWithDiagnostics`。以编程方式调用时，可向
 `EntityGenerator` 传入 `ICSharpEntityTemplate` 以控制源代码布局；其上下文包含无
 冲突的名称、已映射的 CLR 类型以及原始的表/列对象。
@@ -111,7 +139,7 @@ DBMS 划分供应商特定类型的作用范围。可重复添加 `--map` 选项
 ### 以全部格式导出数据字典
 
 ```powershell
-dotnet run --project samples/Bing.Pdm.Tool -- export model.pdm out json,md,html,xlsx,docx zh
+dotnet run --project samples/Bing.Pdm.Tool -- export tests/Bing.Pdm.Tests/Fixtures/complete.pdm out json,md,html,xlsx,docx zh
 ```
 
 ```
@@ -143,7 +171,7 @@ HTML 文件内嵌 CSS、JavaScript 与 SVG，因此无需服务器即可从磁�
 ### 将物理图导出为 SVG
 
 ```powershell
-dotnet run --project samples/Bing.Pdm.Tool -- export model.pdm out svg
+dotnet run --project samples/Bing.Pdm.Tool -- export tests/Bing.Pdm.Tests/Fixtures/complete.pdm out svg
 ```
 
 ```
@@ -157,7 +185,7 @@ out/complete-Overview.svg
 ### 生成 C# 实体
 
 ```powershell
-dotnet run --project samples/Bing.Pdm.Tool -- generate model.pdm gen Demo.Entities
+dotnet run --project samples/Bing.Pdm.Tool -- generate tests/Bing.Pdm.Tests/Fixtures/complete.pdm gen Demo.Entities
 ```
 
 每张表在 `gen` 目录下生成一个文件。`gen/Customer.cs` 的内容如下：
@@ -177,11 +205,12 @@ public class Customer
 ```
 
 名称会转换为无冲突的 PascalCase 标识符，C# 关键字会被转义，与类名冲突的属性会
-追加后缀。省略命名空间时默认使用 `Generated.Entities`。
+追加后缀。默认模板会限定 `DateTime`、`Guid` 等系统类型，避免同名实体遮蔽它们。
+省略命名空间时默认使用 `Generated.Entities`。
 
 ### 覆盖供应商特定类型
 
-内置映射未涵盖的供应商类型，可通过可重复的
+假设 `model.pdm` 含有 `geography` 列。内置映射未涵盖的供应商类型，可通过可重复的
 `--map <dbms|*>:<database-type>=<C#-type>` 按 DBMS 进行映射：
 
 ```powershell
@@ -189,8 +218,8 @@ dotnet run --project samples/Bing.Pdm.Tool -- generate model.pdm gen Demo.Entiti
 ```
 
 该列将变为 `public My.App.Geography Name { get; set; }`。用 `*` 代替 DBMS 代码
-即为全局覆盖。优先级依次为：DBMS 精确/基础匹配、DBMS 内置映射、全局精确/基础
-匹配，最后是显式兜底。
+即为全局覆盖。优先级依次为：DBMS 自定义精确/基础匹配、全局自定义精确/基础匹配、
+厂商及通用内置映射，最后是显式兜底。
 
 ### 使用前先查看诊断信息
 
@@ -265,17 +294,99 @@ XML DTD 与外部实体。缺少模型节点或 XML 格式错误会导致失败�
 
 物理图渲染表、包、注释、文本、椭圆、折线、预定义形状、架构区域、注释链接与扩展
 依赖关系。嵌套的 `SubSymbols` 会递归遍历。矩形、连接路径以及基本的 PowerDesigner
-BGR `COLORREF` 颜色值予以保留；视觉效果与字体保真度不在支持范围内。RTF 注释内容
-会转为转义后的纯文本，包括 CP936 中文。`TargetModel`、`Replication` 与
-`SubReplication` 不属于统一模型。快捷方式只能解析到当前根模型中的对象。
+BGR `COLORREF` 颜色值予以保留。RTF 注释内容会转为转义后的纯文本，包括 CP936 中文。
+`TargetModel`、`Replication`、`SubReplication` 及嵌入的 `FullShortcutModel` 对象保存
+在独立的元数据集合与 `MetadataLookup` 中，不会增加主模型的业务表数量。缺失的复制来源、
+副本和会话引用分别产生诊断；读取不执行复制同步或属性继承。
 
 `IPdmExporter.Write` 支持 JSON、Markdown、HTML 或单个 SVG 物理图。`WriteDiagram`
 用于写出指定的独立 SVG。`PdmOfficeExporter.WriteExcel` 与 `WriteWord` 写入由调用
 方持有的流，并且不会关闭这些流。
 
 物理图保留图元矩形与连接线折点。HTML 中的 SVG 会将 PDM 的纵轴翻转为浏览器坐标系，
-并采用一致的显示样式；它不还原 PowerDesigner 的字体、颜色、阴影或全部图元类型。
+并采用一致的显示样式。可选 `PowerDesigner` 模式会读取 `FontList`、渐变、阴影、线型和
+表内字段显示信息；当前为基于 16.7.4 的基础样式还原，尚未通过人工像素级验收。
+原生模式已还原主键、替代键和多索引清单；RTF 分段保留字体、前景色和下划线，
+阴影按图元读取颜色。触发器清单读取 `Time`、`Event`、`Text` 并保留原始属性。
+RTF 段落支持对齐、按文字单元换行和图元内裁剪；表字段沿模型列顺序显示。
+Windows CLI 使用本机 GDI 字体宽度度量；程序调用方可通过 `MeasureText` 提供同单位的测量器。
+未提供有效测量器时记录 `APPROXIMATE_FONT_METRICS`，继续估算宽度。8pt 小字号已按原生 SVG 校准。
+支持全部列、主键列和键列过滤；自定义表达式可通过 `ColumnFilter` 显式解释。
+无法解释的表达式保留原文、显示全部列并报告 `UNSUPPORTED_DIAGRAM_STYLE`，不执行任意过滤脚本。
+渲染选项的 `Diagnostics` 会指出缺失字体和未解释的样式；出现这些诊断时
+`CanCompareToNative` 为 `false`。CLI 的原生模式会将这些诊断写入标准错误。
+关系图元可显示 PDM 中显式保存的 `ForeignKeyConstraintName`。若显示选项要求该名称，
+但 PDM 未保存 PowerDesigner 计算出的名称，则使用引用 Code 并报告
+`UNRESOLVED_REFERENCE_LABEL`；此时不具备原生视觉对照资格。
 受支持的格式为以 `templates/pdm_template.xml` 和测试样例文件为代表的 XML PDM 家族。
+
+## 版本化 JSON 与跨模型工作区
+
+新 JSON 根对象有 `SchemaVersion: 1`；旧导出缺少版本号时视为版本 0。
+`PdmJsonReader` 在内存迁移后读取，`PdmJsonMigrator.Migrate(Stream, TextWriter)` 可保留
+未知 JSON 字段生成新文件。版本与 PDM 模型的 `Version` 无关。格式说明见
+`docs/schemas/pdm-v1.schema.json`，目前只支持本项目导出的 JSON。
+迁移与读取共用固定模型字段类型校验：损坏的已知字段、空集合元素和重复 JSON 属性会被拒绝，
+可选地址与矩形可为 `null`；缺失可选集合仍为空集合。校验不负责对象 ID 唯一性和完整关系校验。
+未知字段仅承诺在节点级 `Migrate` 中保留；读取为 `PdmInfo` 再导出会忽略未建模字段。
+
+```powershell
+dotnet run --project samples/Bing.Pdm.Tool -- migrate old.json current.json
+dotnet run --project samples/Bing.Pdm.Tool -- export current.json output json,md,html
+```
+
+工作区清单必须显式列出本地 `.pdm` 或 `.json`；路径相对清单文件。仓库内的
+`tests/Bing.Pdm.Tests/Fixtures/workspace.json` 是可运行示例。不会根据
+`TargetModelURL` 下载或自动打开其他文件。工作区中重复键、重复模型 GUID 或不可读取的
+模型会使加载失败；相同的 PDM 对象 ID 可在不同模型中重复。
+
+```powershell
+dotnet run --project samples/Bing.Pdm.Tool -- export tests/Bing.Pdm.Tests/Fixtures/workspace-sales.pdm output json,md,html en --workspace tests/Bing.Pdm.Tests/Fixtures/workspace.json
+dotnet run --project samples/Bing.Pdm.Tool -- generate tests/Bing.Pdm.Tests/Fixtures/workspace-sales.pdm entities Sample.Entities --workspace tests/Bing.Pdm.Tests/Fixtures/workspace.json
+```
+
+`PdmWorkspaceResolver` 在清单内完成 Shortcut、外键端点、列及图元的限定模型解析。
+`PdmObjectAddress` 的 `ModelKey` 与 `PdmId` 一起标识对象；未提供工作区时，JSON
+读取不会自行加载外部模型。业务对象集合修改后调用 `RebuildLookup()` 重建本模型索引，
+此操作不会重新运行跨模型解析或完整校验。
+`new PdmModelValidator().Validate(model, workspace, modelKey)` 独立检查当前集合的身份、
+引用类型和归属，不依赖可能已过期的 Lookup，也不修改模型诊断。
+结果区分 `Structure`、`Diagram`、`Metadata`；缺少显式依赖时外部地址标记为未验证。
+GUID 的大小写、花括号和 D 格式归一化用于匹配，原始字段仍保留。
+
+## 结构差异与图形对照
+
+`PdmModelComparer.Compare(before, after, options)` 只比较数据库结构，不生成迁移 SQL。
+默认按唯一 `ObjectID`、再按模式/包/代码路径配对；名称区分大小写，可通过
+`PdmCompareOptions.IgnoreCase` 调整。报告忽略图形布局和复制元数据，歧义配对标记
+`Incomplete`。列顺序、主键、索引和本模型外键复用对象配对结果，因此仅重建 GUID 不会造成
+关系变化误报；不同包的同名引用按包路径区分，保持 GUID 的引用跨包移动会列出两侧路径。
+通过 `BeforeWorkspace` / `AfterWorkspace` 和对应模型键提供两侧依赖时，外部地址按
+依赖模型 GUID 与对象 GUID 比较，清单别名变化不会误报。没有依赖上下文时保留地址比较，
+并通过 `ValidationIssues` 与 `Incomplete` 明确标记未验证的端点；图形与元数据问题不影响结构比较完整性。
+CLI 可混用 PDM 和 JSON：
+
+```powershell
+dotnet run --project samples/Bing.Pdm.Tool -- diff before.pdm after.json diff-output json,md,html --fail-on-change --fail-on-incomplete
+
+# 两侧使用独立的显式工作区，模型键可以不同
+dotnet run --project samples/Bing.Pdm.Tool -- diff before.pdm after.json diff-output json --before-workspace before-workspace.json --after-workspace after-workspace.json
+dotnet run --project samples/Bing.Pdm.Tool -- export model.pdm output html,svg en --diagram-style powerdesigner
+```
+
+`diff` 默认返回 0；使用 `--fail-on-change` 时有变化返回 3，参数错误返回 2，读取或
+比较失败返回 1。不完整报告默认仍写出并返回 0，同时输出 `INCOMPLETE_COMPARISON`；
+`--fail-on-incomplete` 使不完整比较返回 1，优先于有变化的返回码 3。
+JSON、Markdown 和 HTML 都列出不完整原因。报告列出两侧 DBMS，不判断数据库迁移是否安全。原生脱敏图和当前
+渲染图及差异统计位于 `docs/visual-baseline`，人工视觉确认仍待完成。
+
+## 输出覆盖与失败恢复
+
+CLI 的 export、generate、diff 和 migrate 先写独立暂存目录，再发布全部计划文件。
+成功时覆盖同名计划文件，保留目录内其他文件；中途异常回滚已发布文件并恢复原文件。
+回滚失败会保留恢复目录并打印路径。输入与输出路径冲突仍会拒绝。
+该策略处理进程内失败，不承诺断电、强制终止或多个进程同时写同一目录的跨文件原子性。
+实体类型预检失败仍不创建输出目录或部分实体。验收脚本每次创建独立输出子目录。
 
 ## 贡献指南
 
@@ -309,6 +420,8 @@ BGR `COLORREF` 颜色值予以保留；视觉效果与字体保真度不在支�
 - 修改离线 HTML 数据字典时，还需运行「安装」一节所述的浏览器冒烟测试。该测试会
   导出仓库自带的样例文件，以本地文件方式打开，并检查搜索、图表链接与缩放、外部
   请求、浏览器错误以及窄视口表现。
+- 持有四份业务 PDM 时，使用 `tests/verify-real-pdm.ps1` 运行本地兼容性验收；CI
+  只使用仓库内可公开的样例文件。
 
 ### 提交与拉取请求
 
