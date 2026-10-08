@@ -518,6 +518,16 @@ namespace Bing.Pdm.Tests
                 Assert.Contains("Unknown export format", invalidExport.StandardError);
                 Assert.False(Directory.Exists(invalidFormats));
 
+                var noDiagramDocument = XDocument.Load(Fixture);
+                noDiagramDocument.Descendants(XName.Get("PhysicalDiagrams", "collection")).Remove();
+                var noDiagramInput = Path.Combine(work, "no-diagram.pdm");
+                noDiagramDocument.Save(noDiagramInput);
+                var noDiagramOutput = Path.Combine(work, "no-diagram");
+                var noDiagramExport = RunDotnet(work, tool, "export", noDiagramInput, noDiagramOutput, "json,svg", "en");
+                Assert.Equal(1, noDiagramExport.ExitCode);
+                Assert.Contains("no physical diagrams", noDiagramExport.StandardError);
+                Assert.False(Directory.Exists(noDiagramOutput));
+
                 var duplicateDiagramInput = Path.Combine(work, "duplicate-diagrams.pdm");
                 var duplicateDiagramXml = File.ReadAllText(Fixture).Replace(
                     "</c:PhysicalDiagrams>",
